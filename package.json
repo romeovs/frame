@@ -20,5 +20,8 @@
     "rollup-plugin-hashbang": "^2.2.2",
     "rollup-plugin-node-externals": "^2.1.2",
     "rollup-plugin-node-resolve": "^5.2.0"
+  },
+  "dependencies": {
+    "printf": "^0.5.2"
   }
 }
