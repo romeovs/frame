@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 
 import { clog, cerror, capture } from "../log/capture"
+import { Compilation } from "../compilation"
 
 async function main () {
 	capture()
 
-	const cfg = {
+	const ctx = new Compilation({
 		root: "./example",
-	}
+	}, true)
 
 	clog("")
 	clog("  Welcome to 🖼  Frame!")
 	clog("")
 
-	cerror("  NOT IMPLEMENTED")
-	await 0
+	await ctx.run()
 }
 
 main().catch(function (err : Error) {
