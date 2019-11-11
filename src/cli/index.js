@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+import { install } from "source-map-support"
+install()
+
 import { clog, cerror, capture } from "../log/capture"
 import { Compilation } from "../compilation"
 
