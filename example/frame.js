@@ -1,19 +1,22 @@
 import path from "path"
 
-import * as React from "react"
-import { glob, asset } from "frame/util"
+import React from "react"
+import { glob, asset, combine, Component } from "frame"
+
+const Bar = Component(() => import("./components/bar"))
+const Foo = Component(() => import("./components/foo"))
 
 const bars =
-  glob(__dirname__, "bar/*.yml")
-    .map(function (pth) {
-      const content = util.asset(path)
-      const url = `/${path.basename(pth).replace(".yml", "")}`
-      return {
-        [url]: () => <Bar content={content} />
-      }
-    })
+	glob(__dirname, "bar/*.yml")
+		.map(function (pth : string) : {[string] : React.Node} {
+			const content = asset(pth)
+			const url = `/bar/${path.basename(pth).replace(".yml", "")}`
+			return {
+				[url]: <Bar content={content} />,
+			}
+		})
 
 export default {
-  ...bars,
-  "/foo": () => <Foo />,
+	...combine(bars),
+	"/foo": <Foo />,
 }
