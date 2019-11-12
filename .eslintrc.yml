@@ -1725,13 +1725,19 @@ rules:
 
 overrides:
   - files:
-      - "src/lib/client/*"
-      - "src/lib/client/**/*"
+      - src/lib/client.js
     env:
       node: false
       browser: true
     globals:
       global: readonly
+  - files:
+      - example/frame.js
+    env:
+      node: true
+    globals:
+      __dirname: true
+      __filename: true
   - files:
       - "*_test.js"
       - "**/*_test.js"
