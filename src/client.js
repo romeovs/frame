@@ -80,7 +80,7 @@ function config (ctx : Compilation, modern : boolean, routes : mixed[]) : mixed 
 						{
 							extensions,
 							alias: {
-								frame: path.resolve(__dirname, "lib/client"),
+								frame: path.resolve(__dirname, "lib/lib/client"),
 							},
 						},
 					],

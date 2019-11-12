@@ -71,7 +71,7 @@ function config (ctx : Compilation) : mixed {
 						{
 							extensions,
 							alias: {
-								"frame": path.resolve(__dirname, "lib/server"),
+								"frame": path.resolve(__dirname, "lib/lib/server"),
 							},
 						},
 					],

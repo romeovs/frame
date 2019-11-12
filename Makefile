@@ -20,11 +20,15 @@ list:
 	@echo "example src:"
 	@echo $(EXM_FILES) | xargs -n1 -- echo "  "
 
-cli: dist/cli.js
+cli: lib dist/cli.js
 
-dist/cli.js: $(SRC_FILES)
+dist/cli.js: $(SRC_FILES) rollup.config.js lib
 	@$m "Building cli..."
 	@$(ROLLUP) -c
+
+lib: $(SRC_FILES)
+	@rm -rf dist/lib
+	@cp -r src dist/lib
 
 lint:
 	@$m "Linting..."
