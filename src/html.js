@@ -6,7 +6,7 @@ import { purge } from "./purge-css"
 import { render } from "./render"
 
 export function html (ctx : Compilation, route : Route, shared : Shared) {
-	const body = render(<route.component {...route.props} />)
+	const body = render(ctx, <route.component {...route.props} />)
 	const pcss =
 		ctx.config.dev
 			? shared.css
@@ -16,10 +16,8 @@ export function html (ctx : Compilation, route : Route, shared : Shared) {
 		<HTML
 			body={body}
 			css={pcss}
-
 			cssfile={shared.cssfile}
 			system={shared.systemfile}
-
 			propsfile={route.propsfile}
 			jsfile={route.jsfile}
 			mjsfile={route.mjsfile}
