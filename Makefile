@@ -36,3 +36,6 @@ lint:
 
 example: ./dist/cli.js $(EXM_FILES)
 	@./dist/cli.js
+
+serve:
+	@cd example/dist && http-server
