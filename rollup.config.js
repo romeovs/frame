@@ -52,6 +52,9 @@ export default {
 				"@babel/preset-react",
 				"@babel/preset-flow",
 			],
+			plugins: [
+				"@babel/plugin-proposal-optional-chaining",
+			],
 		}),
 		hashbang(),
 	],
