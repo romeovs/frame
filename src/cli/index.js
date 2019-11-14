@@ -12,7 +12,7 @@ async function main () {
 	const ctx = new Compilation({
 		root: "./example",
 		output: "./example/dist",
-		// dev: true,
+		dev: true,
 		loglevel: "debug",
 		colors: true,
 	}, true)
@@ -21,8 +21,8 @@ async function main () {
 	clog("  Welcome to 🖼  Frame!")
 	clog("")
 
-	await ctx.build()
-	// await ctx.watch()
+	// await ctx.build()
+	await ctx.watch()
 	// await ctx.run()
 }
 

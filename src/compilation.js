@@ -7,8 +7,8 @@ import { ColorfulLogger, LeveledLogger, NoopLogger, SimpleLogger } from "./log"
 import { hash } from "./hash"
 
 import { manifest } from "./manifest"
-import { client } from "./client"
-import { server } from "./server"
+import { client, watch as watchClient } from "./client"
+import { server, watch as watchServer } from "./server"
 import { entrypoints } from "./entrypoints"
 import { render } from "./render"
 import { system } from "./system"
@@ -107,21 +107,54 @@ export class Compilation {
 	}
 
 	async build () {
-		const m = await manifest(this)
-		const e = await entrypoints(this, m)
+		const ctx = this
+		const sys = system(ctx)
+		const m = await manifest(ctx)
+		const e = await entrypoints(ctx, m)
 
-		const [ modern, legacy, srv, sys ] = await Promise.all([
-			client(this, m, e, true),
-			this.config.dev ? [] : client(this, m, e, false),
-			server(this, m, e),
-			system(this),
+		const [ modern, legacy, srv ] = await Promise.all([
+			client(ctx, m, e, true),
+			ctx.config.dev ? [] : client(ctx, m, e, false),
+			server(ctx, m, e),
 		])
 
-		await render(this, m, {
+		await render(ctx, m, {
 			modern,
 			legacy,
 			server: srv,
-			system: sys,
+			system: await sys,
+		})
+	}
+
+	async watch () {
+		const ctx = this
+
+		const sys = system(ctx)
+		const m = await manifest(ctx)
+		const e = await entrypoints(ctx, m)
+
+		// todo: watch manifest files and rebuild
+		// todo: watch root/frame and rebuild entrypoints
+
+		const x = {
+			modern: null,
+			server: [],
+			legacy: [],
+			system: await sys,
+		}
+
+		const c = watchClient(ctx, m, e, true)
+		async function r () {
+			if (x.modern && x.server) {
+				ctx.log("Rendering routes")
+				await render(ctx, m, x)
+				ctx.log("Done!")
+			}
+		}
+
+		c.on("build", function (modern) {
+			x.modern = modern
+			r()
 		})
 	}
 }

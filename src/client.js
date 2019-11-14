@@ -1,6 +1,6 @@
 import path from "path"
 
-import { rollup } from "rollup"
+import { rollup, watch as Watch } from "rollup"
 import resolve from "rollup-plugin-node-resolve"
 import commonjs from "rollup-plugin-commonjs"
 import replace from "@rollup/plugin-replace"
@@ -8,7 +8,7 @@ import { terser } from "rollup-plugin-terser"
 
 import Timer from "./timer"
 import { babel } from "./babel"
-import { print, plugins } from "./shared"
+import { print, plugins, WrapWatcher } from "./shared"
 import { jspath } from "./constants"
 
 type JSMap = {
@@ -31,6 +31,10 @@ export async function client (ctx : Compilation, manifest : Manifest, entrypoint
 	await bundle.write(cfg.output)
 	ctx.log("Client built (modern=%s) (%s)", modern, timer)
 
+	return marshal(ctx, output)
+}
+
+function marshal (ctx, output) {
 	return (
 		output
 			.filter(asset => asset.isEntry || asset.fileName.endsWith(".css"))
@@ -51,6 +55,39 @@ export async function client (ctx : Compilation, manifest : Manifest, entrypoint
 	)
 }
 
+export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints) {
+	const modern = true
+
+	ctx.log("Watching client (modern=%s)", modern)
+
+	const js = entrypoints.map(e => e.entrypoint)
+	const cfg = config(ctx, modern, js)
+
+	const watcher = Watch(cfg)
+	const evts = new WrapWatcher(watcher)
+
+	watcher.on("event", async function (evt) {
+		switch (evt.code) {
+		case "START":
+			ctx.log("Building client (modern=%s)", modern)
+			break
+		case "BUNDLE_END": {
+			const bundle = evt.result
+			const timings = bundle.getTimings()
+			print(ctx, "Client bundle", timings)
+
+			const { output } = await bundle.generate(cfg.output)
+			await bundle.write(cfg.output)
+			ctx.log("Client built (modern=%s) (%sms)", modern, evt.duration)
+
+			evts.emit("build", marshal(ctx, output))
+		}
+		}
+	})
+
+	return evts
+}
+
 const extensions = [
 	".js",
 	".json",
@@ -63,9 +100,10 @@ function config (ctx : Compilation, modern : boolean, js : string[]) : mixed {
 		output: {
 			dir: path.resolve(ctx.config.output, jspath),
 			format: modern ? "es" : "system",
-			sourcemap: true,
+			sourcemap: !ctx.config.dev,
 			entryFileNames: modern ? "e.[hash].mjs" : "e.[hash].js",
 			chunkFileNames: modern ? "[hash].mjs" : "[hash].js",
+			indent: false,
 		},
 		treeshake: !ctx.config.dev,
 		plugins: [
@@ -83,6 +121,7 @@ function config (ctx : Compilation, modern : boolean, js : string[]) : mixed {
 					"node_modules/react/index.js": Object.keys(require("react")),
 					"node_modules/react-dom/index.js": Object.keys(require("react-dom")),
 				},
+				sourceMap: !ctx.config.dev,
 			}),
 			replace({
 				"process.env.NODE_ENV": JSON.stringify(ctx.config.dev ? "development" : "production"),

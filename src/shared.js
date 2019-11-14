@@ -1,4 +1,7 @@
+import EventEmitter from "events"
+
 import postcss from "rollup-plugin-postcss"
+
 import { hash } from "./hash"
 import { format } from "./timer"
 
@@ -30,4 +33,15 @@ export function plugins (ctx : Compilation) {
 			],
 		}),
 	]
+}
+
+export class WrapWatcher extends EventEmitter {
+	constructor (watcher) {
+		super()
+		this._watcher = watcher
+	}
+
+	close () {
+		this._watcher.close()
+	}
 }

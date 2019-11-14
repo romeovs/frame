@@ -2,15 +2,21 @@ import React from "react"
 import DOM from "react-dom"
 import { decompress } from "../compress"
 
-export async function init (Component) {
-	console.log("This page is rendered with Frame.js")
-
+export async function init (Component, dev) {
 	const props = await getprops()
 
-	DOM.hydrate(
-		<Component {...props} />,
-		document.getElementById("app"),
-	)
+	if (process.env.NODE_ENV === "development") {
+		console.log("This page is rendered with Frame.js")
+		DOM.render(
+			<Component {...props} />,
+			document.getElementById("app"),
+		)
+	} else {
+		DOM.hydrate(
+			<Component {...props} />,
+			document.getElementById("app"),
+		)
+	}
 }
 
 async function getprops () : {[string] : mixed } {

@@ -1,13 +1,12 @@
 import path from "path"
 
-import { rollup } from "rollup"
+import { rollup, watch as Watch } from "rollup"
 import resolve from "rollup-plugin-node-resolve"
 import builtins from "builtin-modules"
 
 import Timer from "./timer"
-import { print, plugins } from "./shared"
+import { print, plugins, WrapWatcher } from "./shared"
 import { babel } from "./babel"
-import { jspath } from "./constants"
 
 const extensions = [
 	".js",
@@ -29,7 +28,10 @@ export async function server (ctx : Compilation, manifest : Manifest, entrypoint
 	ctx.log("Server built (%s)", timer)
 
 	const { output } = await bundle.generate(cfg.output)
+	return marshal(ctx, output)
+}
 
+function marshal (ctx, output) {
 	return (
 		output
 			.filter(asset => asset.isEntry)
@@ -40,6 +42,37 @@ export async function server (ctx : Compilation, manifest : Manifest, entrypoint
 				}
 			})
 	)
+}
+
+export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints) {
+	ctx.log("Watching server")
+
+	const js = entrypoints.map(e => e.entrypoint)
+	const cfg = config(ctx, js)
+
+	const watcher = Watch(cfg)
+	const evts = new WrapWatcher(watcher)
+
+	watcher.on("event", async function (evt) {
+		switch (evt.code) {
+		case "START":
+			ctx.log("Building server")
+			break
+		case "BUNDLE_END": {
+			const bundle = evt.result
+			const timings = bundle.getTimings()
+			print(ctx, "Server bundle", timings)
+
+			const { output } = await bundle.generate(cfg.output)
+			await bundle.write(cfg.output)
+			ctx.log("Server built (%sms)", evt.duration)
+
+			evts.emit("build", marshal(ctx, output))
+		}
+		}
+	})
+
+	return evts
 }
 
 function config (ctx : Compilation, js : string[]) : mixed {

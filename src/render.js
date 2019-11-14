@@ -29,9 +29,11 @@ async function one (ctx : Compilation, js : JS, route : RouteDef) {
 	const legacy = js.legacy.find(f => f.id === route.id)?.src
 	const css = (js.modern || js.legacy).filter(f => f.type === "css")
 
-	const Component = require(server)
-
-	const body = DOM.renderToString(<Component {...route.props} />)
+	let body = ""
+	if (server) {
+		const Component = require(server)
+		body = DOM.renderToString(<Component {...route.props} />)
+	}
 
 	const pcss =
 		ctx.config.dev
