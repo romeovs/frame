@@ -1,3 +1,7 @@
 export type Config = {
-  // TODO
+	// Root is the root path of the website source.
+	root : string,
+
+	// Output is the output directory
+	output : string,
 }

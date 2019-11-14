@@ -5,6 +5,7 @@ import printf from "printf"
 import { type Config } from "./config"
 import { ColorfulLogger, LeveledLogger, NoopLogger, SimpleLogger } from "./log"
 import { build } from "./build"
+import { watch } from "./watch"
 import { hash } from "./hash"
 import fs from "./fs"
 
@@ -55,6 +56,10 @@ export class Compilation {
 
 	run () {
 		return build(this)
+	}
+
+	watch () {
+		return watch(this)
 	}
 
 	get cachedir () : string {

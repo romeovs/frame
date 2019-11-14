@@ -1,6 +1,8 @@
+import EventEmitter from "events"
+
 import path from "path"
 
-import { rollup } from "rollup"
+import { rollup, watch as Watcher } from "rollup"
 import babel from "rollup-plugin-babel"
 import resolve from "rollup-plugin-node-resolve"
 import commonjs from "rollup-plugin-commonjs"
@@ -21,7 +23,7 @@ const extensions = [
 
 function config (ctx : Compilation, modern : boolean, routes : mixed[]) : mixed {
 	/* eslint-disable global-require */
-	const input = Object.values(routes).map(function (r) {
+	const input = routes.map(function (r) {
 		return path.resolve(ctx.cachedir, "client", `${r.entryid}.js`)
 	})
 
@@ -105,6 +107,10 @@ async function build (ctx : Compilation, modern : boolean, assets) : Promise<Ass
 	await write(ctx, output)
 	ctx.log("Client built (modern=%s) (%s)", modern, timer)
 
+	return entrypoints(output)
+}
+
+function entrypoints (output) {
 	return (
 		output
 			.filter(asset => asset.isEntry)
@@ -150,4 +156,40 @@ async function write (ctx : Compilation, output : mixed) {
 	}
 
 	await Promise.all(promises)
+}
+
+export function watch (ctx : Compilation, routes : Route[]) {
+	const evts = new EventEmitter()
+	ctx.log("Watching client")
+	const cfg = config(ctx, true, routes)
+	cfg.watch = {
+		exclude: [
+			`${ctx.cachedir}/**`,
+			`node_modules/**`,
+		],
+	}
+	const watcher = Watcher(cfg)
+
+	watcher.on("event", async function (evt) {
+		switch (evt.code) {
+		case "START":
+			ctx.log("Client building")
+			break
+		case "BUNDLE_END": {
+			print(ctx, "Client bundle", evt.result.getTimings())
+			const { output } = await evt.result.generate(cfg.output)
+			await write(ctx, output)
+			ctx.log("Client built (%sms)", evt.duration)
+
+			console.log("ERE")
+			evts.emit("entrypoints", entrypoints(output))
+			break
+		}
+		}
+	})
+
+	return {
+		on: evts.on.bind(evts),
+		close: watcher.close.bind(watcher),
+	}
 }

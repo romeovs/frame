@@ -2,7 +2,7 @@ import path from "path"
 
 import Timer from "./timer"
 
-import { rollup } from "rollup"
+import { rollup, watch as Watcher } from "rollup"
 import babel from "rollup-plugin-babel"
 import resolve from "rollup-plugin-node-resolve"
 import builtins from "builtin-modules"
@@ -82,18 +82,40 @@ function config (ctx : Compilation) : mixed {
 	}
 }
 
-export async function server (ctx : Compilation, assets : AssetInfo) : string {
+export async function server (ctx : Compilation) : string {
 	const timer = new Timer()
 	ctx.log("Building server")
 
-	const c = config(ctx, assets)
-	const bundle = await rollup(c)
+	const cfg = config(ctx)
+	const bundle = await rollup(cfg)
 
 	const timings = bundle.getTimings()
 	print(ctx, "Server bundle", timings)
 
-	await bundle.write(c.output)
+	await bundle.write(cfg.output)
 	ctx.log("Server built (%s)", timer)
 
 	return path.resolve(ctx.cachedir, "server/frame.js")
+}
+
+export function watch (ctx : Compilation) {
+	ctx.log("Watching server")
+
+	const cfg = config(ctx)
+	const watcher = Watcher(cfg)
+
+	watcher.on("event", async function (evt) {
+		switch (evt.code) {
+		case "START":
+			ctx.log("Server building")
+			break
+		case "BUNDLE_END":
+			print(ctx, "Server bundle", evt.result.getTimings())
+			await evt.result.write(cfg.output)
+			ctx.log("Server built (%sms)", evt.duration)
+			break
+		}
+	})
+
+	return watcher
 }
