@@ -1,6 +1,6 @@
 import path from "path"
-import * as React from "react"
 import Glob from "glob"
+import { type RouteDef } from "../manifest"
 
 export function glob (...segments : string[]) : string[] {
 	const pat = path.join(...segments)
@@ -8,20 +8,24 @@ export function glob (...segments : string[]) : string[] {
 }
 
 export function asset (path : string) : mixed {
-	// TODO
-	// global._frame_asset(path)
+	global._frame_asset(path)
 	return []
 }
 
-export function Component (fn : () => Promise<React.Component>) : React.Node {
-	return React.lazy(fn)
+export function Route (component : string, props : {[string] : mixed}) : RouteDef {
+	return {
+		component,
+		props,
+	}
 }
 
-export function combine (objs : {[string] : mixed }[]) : {[string] : mixed } {
-	let r = {}
-	for (const obj of objs) {
-		r = { ...r, ...obj }
+export function combine (acc : {[string] : RouteDef }, next : {[string] : RouteDef }) : {[string] : RouteDef } {
+	return {
+		...acc,
+		...next,
 	}
+}
 
-	return r
+export function init (Component) {
+	return Component
 }

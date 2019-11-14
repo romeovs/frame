@@ -6,9 +6,8 @@ export async function init (Component) {
 	console.log("This page is rendered with Frame.js")
 
 	const props = await getprops()
-	console.log("props", props)
 
-	DOM.render(
+	DOM.hydrate(
 		<Component {...props} />,
 		document.getElementById("app"),
 	)

@@ -1,17 +1,19 @@
 import path from "path"
-
 import printf from "printf"
 
+import fs from "./fs"
 import { type Config } from "./config"
 import { ColorfulLogger, LeveledLogger, NoopLogger, SimpleLogger } from "./log"
-import { build } from "./build"
-import { watch } from "./watch"
 import { hash } from "./hash"
-import fs from "./fs"
+
+import { manifest } from "./manifest"
+import { client } from "./client"
+import { server } from "./server"
+import { entrypoints } from "./entrypoints"
+import { render } from "./render"
+import { system } from "./system"
 
 export class Compilation {
-	config : Config
-
 	constructor (config : Config, cli : boolean = false) {
 		this.config = config
 
@@ -54,20 +56,12 @@ export class Compilation {
 		}
 	}
 
-	run () {
-		return build(this)
-	}
-
-	watch () {
-		return watch(this)
-	}
-
 	get cachedir () : string {
 		return path.resolve(this.config.root, ".frame_cache")
 	}
 
-	get outputdir () {
-		return path.resolve(this.config.output)
+	get outputdir () : string {
+		return path.resolve(this.config.output || `${this.config.root}/dist`)
 	}
 
 	// Write the contents of the file to the output folder, performing
@@ -100,26 +94,6 @@ export class Compilation {
 		await fs.writeFile(fn, content)
 	}
 
-	_resolveOutputFile (filename : string) : string {
-		return path.resolve(this.config.output, filename.replace(/^\//, ""))
-	}
-
-	async copy (src : string, dst : string) : Promise<string> {
-		const fname = this._resolveOutputFile(dst)
-		const dir = path.dirname(fname)
-
-		this.log("Writing %s", fname)
-
-		await fs.mkdir(dir, { recursive: true })
-		await fs.copyFile(src, fname)
-
-		return fname
-	}
-
-	read (...segments : string[]) : Promise<string> {
-		return fs.readFile(path.resolve(...segments), "utf-8")
-	}
-
 	async writeCache (filename : string, content : string | Buffer) : Promise<string> {
 		const fname = path.resolve(this.cachedir, filename.replace(/^\//, ""))
 		const dir = path.dirname(fname)
@@ -130,5 +104,24 @@ export class Compilation {
 		await fs.writeFile(fname, content)
 
 		return fname
+	}
+
+	async build () {
+		const m = await manifest(this)
+		const e = await entrypoints(this, m)
+
+		const [ modern, legacy, srv, sys ] = await Promise.all([
+			client(this, m, e, true),
+			this.config.dev ? [] : client(this, m, e, false),
+			server(this, m, e),
+			system(this),
+		])
+
+		await render(this, m, {
+			modern,
+			legacy,
+			server: srv,
+			system: sys,
+		})
 	}
 }

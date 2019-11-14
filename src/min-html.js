@@ -17,4 +17,8 @@ export function minify (ctx : Compilation, markup : string) : string {
 		sortAttributes: true,
 		useShortDoctype: true,
 	})
+		.replace(/<style><\/style>/g, "")
+		.replace(/<\/style><style>/g, "")
+		.replace(/defer=""/, "defer")
+		.replace(/nomodule=""/, "nomodule")
 }

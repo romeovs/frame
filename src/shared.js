@@ -18,7 +18,7 @@ export function plugins (ctx : Compilation) {
 		postcss({
 			modules: {
 				generateScopedName (classname : string, filename : string, css : string) : string {
-					return `${classname}_${hash(css)}`
+					return `${classname}_${hash(css.replace(/\s/g, ""))}`
 				},
 			},
 			extract: true,

@@ -11,13 +11,19 @@ async function main () {
 
 	const ctx = new Compilation({
 		root: "./example",
+		output: "./example/dist",
+		// dev: true,
+		loglevel: "debug",
+		colors: true,
 	}, true)
 
 	clog("")
 	clog("  Welcome to 🖼  Frame!")
 	clog("")
 
-	await ctx.run()
+	await ctx.build()
+	// await ctx.watch()
+	// await ctx.run()
 }
 
 main().catch(function (err : Error) {

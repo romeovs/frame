@@ -1,9 +1,15 @@
 import Purgecss from "purgecss"
 
-export function purge (ctx : Compilation, markup : string, css : string) : string {
+type CSS = {
+	type : "css",
+	content : string,
+	src : string,
+}
+
+export function purge (ctx : Compilation, markup : string, css : CSS[]) : string {
 	const purgecss = new Purgecss({
 		css: [{
-			raw: css,
+			raw: css.map(asset => clean(asset.content)).join("\n"),
 			extension: "css",
 		}],
 		content: [{
@@ -13,4 +19,8 @@ export function purge (ctx : Compilation, markup : string, css : string) : strin
 	})
 
 	return purgecss.purge().map(file => file.css).join("")
+}
+
+function clean (content : string) : stirng {
+	return content.replace(/\/\*#[^\/]+\*\//g, "")
 }

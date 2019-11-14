@@ -1,35 +1,65 @@
-import EventEmitter from "events"
-
 import path from "path"
 
-import { rollup, watch as Watcher } from "rollup"
-import babel from "rollup-plugin-babel"
+import { rollup } from "rollup"
 import resolve from "rollup-plugin-node-resolve"
 import commonjs from "rollup-plugin-commonjs"
 import replace from "@rollup/plugin-replace"
 import { terser } from "rollup-plugin-terser"
 
 import Timer from "./timer"
-import { type Compilation } from "./compilation"
+import { babel } from "./babel"
 import { print, plugins } from "./shared"
-import { hash } from "./hash"
 import { jspath } from "./constants"
+
+type JSMap = {
+	id : string,
+	src : string,
+}
+
+export async function client (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints, modern : boolean) : Promise<JSMap> {
+	const timer = new Timer()
+	ctx.log("Building client (modern=%s)", modern)
+
+	const js = entrypoints.map(e => e.entrypoint)
+	const cfg = config(ctx, modern, js)
+
+	const bundle = await rollup(cfg)
+	const timings = bundle.getTimings()
+	print(ctx, "Client bundle", timings)
+
+	const { output } = await bundle.generate(cfg.output)
+	await bundle.write(cfg.output)
+	ctx.log("Client built (modern=%s) (%s)", modern, timer)
+
+	return (
+		output
+			.filter(asset => asset.isEntry || asset.fileName.endsWith(".css"))
+			.map(function (asset : mixed) : JSMap {
+				if (asset.fileName.endsWith(".css")) {
+					return {
+						src: `/${jspath}/${asset.fileName}`,
+						content: asset.source,
+						type: "css",
+					}
+				}
+				return {
+					src: `/${jspath}/${asset.fileName}`,
+					id: path.basename(asset.facadeModuleId).replace(".js", ""),
+					type: "js",
+				}
+			})
+	)
+}
 
 const extensions = [
 	".js",
-	".jsx",
 	".json",
 ]
 
-function config (ctx : Compilation, modern : boolean, routes : mixed[]) : mixed {
-	/* eslint-disable global-require */
-	const input = routes.map(function (r) {
-		return path.resolve(ctx.cachedir, "client", `${r.entryid}.js`)
-	})
-
+function config (ctx : Compilation, modern : boolean, js : string[]) : mixed {
 	return {
 		perf: true,
-		input,
+		input: js,
 		output: {
 			dir: path.resolve(ctx.config.output, jspath),
 			format: modern ? "es" : "system",
@@ -57,139 +87,9 @@ function config (ctx : Compilation, modern : boolean, routes : mixed[]) : mixed 
 			replace({
 				"process.env.NODE_ENV": JSON.stringify(ctx.config.dev ? "development" : "production"),
 			}),
-			babel({
-				babelrc: false,
-				exclude: "node_modules/**",
-				extensions,
-				presets: [
-					[
-						"@babel/preset-env",
-						{
-							modules: false,
-							useBuiltIns: "usage",
-							corejs: 3,
-							targets: modern ? { esmodules: true } : config.browsers,
-						},
-					],
-					"@babel/preset-react",
-					"@babel/preset-flow",
-				],
-				plugins: [
-					"@babel/plugin-syntax-dynamic-import",
-					"@babel/plugin-proposal-optional-chaining",
-					[
-						"babel-plugin-module-resolver",
-						{
-							extensions,
-							alias: {
-								frame: path.resolve(__dirname, "lib/lib/client"),
-							},
-						},
-					],
-				],
-			}),
+			babel(ctx, false, modern),
 			...plugins(ctx),
 			ctx.config.dev ? {} : terser(),
 		],
-	}
-}
-
-async function build (ctx : Compilation, modern : boolean, assets) : Promise<Asset> {
-	const timer = new Timer()
-	ctx.log("Building client (modern=%s)", modern)
-
-	const c = config(ctx, modern, assets)
-	const bundle = await rollup(c)
-	const timings = bundle.getTimings()
-	print(ctx, "Client bundle", timings)
-
-	const { output } = await bundle.generate(c.output)
-	await write(ctx, output)
-	ctx.log("Client built (modern=%s) (%s)", modern, timer)
-
-	return entrypoints(output)
-}
-
-function entrypoints (output) {
-	return (
-		output
-			.filter(asset => asset.isEntry)
-			.map(function (asset : mixed) {
-				return {
-					src: `/${jspath}/${asset.fileName}`,
-					id: path.basename(asset.facadeModuleId).replace(".js", ""),
-				}
-			})
-	)
-}
-
-export async function client (ctx : Compilation, assets) : Promise<Asset> {
-	const [ modern, legacy ] = await Promise.all([
-		build(ctx, true, assets),
-		ctx.config.dev ? [] : build(ctx, false, assets),
-	])
-
-	return {
-		modern,
-		legacy,
-	}
-}
-
-// Write the bundle to disk
-async function write (ctx : Compilation, output : mixed) {
-	const promises = []
-
-	for (const chunk of output) {
-		ctx.debug("Writing client file %s", chunk.fileName)
-
-		if (chunk.isAsset) {
-			promises.push(ctx.write(`/${jspath}/${chunk.fileName}`, chunk.source))
-		}
-
-		let comment = ""
-		if (chunk.map) {
-			comment = `//# sourceMappingURL=/${jspath}/${chunk.fileName}.map`
-			promises.push(ctx.write(`/${jspath}/${chunk.fileName}.map`, chunk.map.toString()))
-		}
-
-		promises.push(ctx.write(`/${jspath}/${chunk.fileName}`, chunk.code + comment))
-	}
-
-	await Promise.all(promises)
-}
-
-export function watch (ctx : Compilation, routes : Route[]) {
-	const evts = new EventEmitter()
-	ctx.log("Watching client")
-	const cfg = config(ctx, true, routes)
-	cfg.watch = {
-		exclude: [
-			`${ctx.cachedir}/**`,
-			`node_modules/**`,
-		],
-	}
-	const watcher = Watcher(cfg)
-
-	watcher.on("event", async function (evt) {
-		switch (evt.code) {
-		case "START":
-			ctx.log("Client building")
-			break
-		case "BUNDLE_END": {
-			print(ctx, "Client bundle", evt.result.getTimings())
-			const { output } = await evt.result.generate(cfg.output)
-			await write(ctx, output)
-			ctx.log("Client built (%sms)", evt.duration)
-
-			console.log("ERE")
-			evts.emit("entrypoints", entrypoints(output))
-			break
-		}
-		}
-	})
-
-	return {
-		on: evts.on.bind(evts),
-		close: watcher.close.bind(watcher),
 	}
 }
