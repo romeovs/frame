@@ -4,6 +4,7 @@ import webpack from "webpack"
 import express from "express"
 import hot from "webpack-hot-middleware"
 
+import { cerror } from "./log/capture"
 import Timer from "./timer"
 import { jspath } from "./constants"
 import { config as babel } from "./babel"
@@ -32,6 +33,11 @@ export function watch (ctx : Compilation, manifest : manifest, entrypoints : Ent
 		aggregateTimeout: 300,
 		poll: undefined,
 	}, function (err, stats) {
+		if (err) {
+			cerror(err)
+			return
+		}
+
 		const json = stats.toJson()
 		ctx.log("Client built (%sms)", json.time)
 		const assets = json.assetsByChunkName
