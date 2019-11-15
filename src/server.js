@@ -3,6 +3,7 @@ import path from "path"
 import { rollup } from "rollup"
 import resolve from "rollup-plugin-node-resolve"
 import builtins from "builtin-modules"
+import commonjs from "rollup-plugin-commonjs"
 
 import Timer from "./timer"
 import { print, plugins } from "./shared"
@@ -65,6 +66,13 @@ function config (ctx : Compilation, js : string[]) : mixed {
 			resolve({
 				extensions,
 				preferBuiltins: true,
+			}),
+			commonjs({
+				extensions,
+				include: [
+					"node_modules/**",
+				],
+				sourceMap: !ctx.config.dev,
 			}),
 			babel(ctx, true, false),
 			...plugins(ctx),
