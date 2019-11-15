@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+	"bin": {
+		"frame": "dist/cli.js"
+	},
   "devDependencies": {
     "babel-eslint": "^10.0.3",
     "eslint": "^6.6.0",
