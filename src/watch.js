@@ -5,10 +5,10 @@ import express from "express"
 import hot from "webpack-hot-middleware"
 
 import { cerror } from "./log/capture"
-import Timer from "./timer"
 import { jspath } from "./constants"
 import { config as babel } from "./babel"
 import { WrapWatcher } from "./shared"
+import * as pcss from "./postcss"
 
 export function watch (ctx : Compilation, manifest : manifest, entrypoints : Entrypoints) {
 	ctx.log("Watching client")
@@ -84,7 +84,14 @@ function config (ctx : Compilation, entrypoints : Entrypoints) {
 				use: [{ loader: "style-loader" }, {
 					loader: "css-loader",
 					options: {
+						importLoaders: 1,
 						modules: true,
+					},
+				}, {
+					loader: "postcss-loader",
+					options: {
+						parser: "sugarss",
+						plugins: pcss.plugins(ctx),
 					},
 				}],
 			}, {

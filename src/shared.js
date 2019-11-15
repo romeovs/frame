@@ -1,8 +1,8 @@
 import EventEmitter from "events"
 
 import postcss from "rollup-plugin-postcss"
+import * as pcss from "./postcss"
 
-import { hash } from "./hash"
 import { format } from "./timer"
 
 type Timings = {
@@ -20,17 +20,13 @@ export function plugins (ctx : Compilation) {
 	return [
 		postcss({
 			modules: {
-				generateScopedName (classname : string, filename : string, css : string) : string {
-					return `${classname}_${hash(css.replace(/\s/g, ""))}`
-				},
+				generateScopedName: pcss.generateScopedName,
 			},
 			extract: true,
 			inject: true,
 			sourceMap: true,
 			minimize: !ctx.config.dev,
-			plugins: [
-				// TODO
-			],
+			plugins: pcss.plugins(ctx),
 		}),
 	]
 }
