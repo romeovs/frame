@@ -12,8 +12,9 @@ export function asset (path : string) : mixed {
 	return global._frame_asset(path)
 }
 
-export function Route (component : string, props : {[string] : mixed}) : RouteDef {
+export function Route (url : string, component : string, props : {[string] : mixed} = {}) : RouteDef {
 	return {
+		url,
 		component,
 		props,
 	}

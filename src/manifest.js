@@ -6,6 +6,7 @@ import { asset } from "./assets"
 
 
 type RouteDef = {
+	url : string,
 	component : string,
 	props : {[string] : mixed },
 }
@@ -58,12 +59,16 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	const globs = new Set()
 	global._frame_glob = globs.add.bind(globs)
 
-
-	const routes = await cfg.routes()
-	for (const url in routes) {
-		const route = routes[url]
-		route.id = hash(path.resolve(ctx.config.root, route.component))
-		route.url = url
+	const defs = await cfg.routes()
+	const routes = {}
+	for (const def of defs) {
+		const { url, component, props } = def
+		routes[url] = {
+			id: hash(path.resolve(ctx.config.root, component)),
+			url,
+			component,
+			props,
+		}
 	}
 
 	const m : Manifest = {

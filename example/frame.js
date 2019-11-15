@@ -1,5 +1,5 @@
 import path from "path"
-import { Route, glob, asset, combine, type RouteDef } from "frame/server"
+import { Route, glob, asset, type RouteDef } from "frame/server"
 
 export default {
 	images: {
@@ -15,22 +15,20 @@ export default {
 			png: [ "png" ],
 		},
 	},
-	routes () : {[string] : RouteDef } {
+	async routes () : RouteDef {
 		const bars =
 			glob(__dirname, "bar/*.yml")
-				.map(function (pth : string) : {[string] : RouteDef } {
+				.map(async function (pth : string) : RouteDef {
 					const url = `/bar/${path.basename(pth).replace(".yml", "")}`
-					const content = asset(pth)
 
-					return {
-						[url]: Route("./components/bar", { content }),
-					}
+					return Route(url, "./components/bar", {
+						title: (await asset(pth)).content.title,
+					})
 				})
-				.reduce(combine, {})
 
-		return {
-			...bars,
-			"/foo": Route("./components/foo", {}),
-		}
+		return [
+			...await Promise.all(bars),
+			Route("/foo", "./components/foo"),
+		]
 	},
 }
