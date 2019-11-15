@@ -31,6 +31,14 @@ export type Manifest = {
 
 	// All assets that were loaded in the manifest file
 	assets : string[],
+
+	// All the globs that were used
+	globs : string[],
+
+	// Globals shared between js and css
+	globals : {
+		[string] : mixed,
+	},
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {
@@ -38,9 +46,11 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	const cfg = await load(pth)
 
 	const assets = new Set()
-	global._frame_asset = function (asset : string) {
-		assets.add(asset)
-	}
+	global._frame_asset = assets.add.bind(assets)
+
+	const globs = new Set()
+	global._frame_glob = globs.add.bind(globs)
+
 
 	const routes = cfg.routes()
 	for (const url in routes) {
@@ -54,6 +64,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		...cfg,
 		routes,
 		assets: Array.from(assets),
+		globs: Array.from(globs),
 	}
 
 	await ctx.writeCache("manifest.json", JSON.stringify(m))

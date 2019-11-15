@@ -4,6 +4,7 @@ import { type RouteDef } from "../manifest"
 
 export function glob (...segments : string[]) : string[] {
 	const pat = path.join(...segments)
+	global._frame_glob(pat)
 	return Glob.sync(pat)
 }
 

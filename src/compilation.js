@@ -1,5 +1,6 @@
 import path from "path"
 import printf from "printf"
+import chokidar from "chokidar"
 
 import fs from "./fs"
 import { type Config } from "./config"
@@ -7,8 +8,10 @@ import { ColorfulLogger, LeveledLogger, NoopLogger, SimpleLogger } from "./log"
 import { hash } from "./hash"
 
 import { manifest } from "./manifest"
-import { client, watch as watchClient } from "./client"
-import { server, watch as watchServer } from "./server"
+// import { client, watch as watchClient } from "./client"
+import { client } from "./client"
+import { watch as watchClient } from "./watch"
+import { server } from "./server"
 import { entrypoints } from "./entrypoints"
 import { render } from "./render"
 import { system } from "./system"
@@ -54,6 +57,10 @@ export class Compilation {
 		} else {
 			throw new Error(printf(msg, ...args))
 		}
+	}
+
+	get framefile () : string {
+		return path.resolve(this.config.root, "frame.js")
 	}
 
 	get cachedir () : string {
@@ -108,7 +115,9 @@ export class Compilation {
 
 	async build () {
 		const ctx = this
+		const timer = new Timer()
 		const sys = system(ctx)
+
 		const m = await manifest(ctx)
 		const e = await entrypoints(ctx, m)
 
@@ -124,37 +133,50 @@ export class Compilation {
 			server: srv,
 			system: await sys,
 		})
+
+		ctx.log("Done! (%s)", timer)
 	}
 
 	async watch () {
 		const ctx = this
 
-		const sys = system(ctx)
-		const m = await manifest(ctx)
-		const e = await entrypoints(ctx, m)
+		let m
+		let e
 
-		// todo: watch manifest files and rebuild
-		// todo: watch root/frame and rebuild entrypoints
+		async function rebuild () {
+			m = await manifest(ctx)
+
+			// Changing the entrypoints will trigger a client build
+			e = await entrypoints(ctx, m)
+		}
+
+		await rebuild()
+
+		// TODO: find a way to refresh when props change
+
+		const assets = chokidar.watch([
+			ctx.framefile,
+			...m.globs,
+			...m.assets,
+		])
+		assets.on("change", rebuild)
+		assets.on("add", rebuild)
+		assets.on("unlink", rebuild)
 
 		const x = {
 			modern: null,
 			server: [],
 			legacy: [],
-			system: await sys,
 		}
 
 		const c = watchClient(ctx, m, e, true)
-		async function r () {
+		c.on("build", async function (modern) {
+			x.modern = modern
 			if (x.modern && x.server) {
 				ctx.log("Rendering routes")
 				await render(ctx, m, x)
 				ctx.log("Done!")
 			}
-		}
-
-		c.on("build", function (modern) {
-			x.modern = modern
-			r()
 		})
 	}
 }

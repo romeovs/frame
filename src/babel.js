@@ -4,6 +4,15 @@ import babelPlugin from "rollup-plugin-babel"
 const extensions = [ ".js" ]
 
 export function babel (ctx : Comilation, server : boolean, modern : boolean) : babelPlugin {
+	return babelPlugin({
+		babelrc: false,
+		exclude: "node_modules/**",
+		extensions,
+		...config(ctx, server, modern),
+	})
+}
+
+export function config (ctx : Compilation, server : boolean, modern : boolean) {
 	const targets =
 		server
 	 		? { node: true }
@@ -11,15 +20,12 @@ export function babel (ctx : Comilation, server : boolean, modern : boolean) : b
 				? { esmodules: true }
 				: ctx.config.browsers
 
-	return babelPlugin({
-		babelrc: false,
-		exclude: "node_modules/**",
-		extensions,
+	return {
 		presets: [
 			[
 				"@babel/preset-env",
 				{
-					modules: false,
+					// modules: false,
 					useBuiltIns: "usage",
 					corejs: 3,
 					targets,
@@ -45,5 +51,5 @@ export function babel (ctx : Comilation, server : boolean, modern : boolean) : b
 				},
 			],
 		],
-	})
+	}
 }

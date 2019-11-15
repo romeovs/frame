@@ -36,12 +36,12 @@ export function plugins (ctx : Compilation) {
 }
 
 export class WrapWatcher extends EventEmitter {
-	constructor (watcher) {
+	constructor (closer) {
 		super()
-		this._watcher = watcher
+		this._closer = closer
 	}
 
 	close () {
-		this._watcher.close()
+		this._closer.close()
 	}
 }
