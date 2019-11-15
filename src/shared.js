@@ -1,6 +1,8 @@
 import EventEmitter from "events"
 
 import postcss from "rollup-plugin-postcss"
+import url from "rollup-plugin-url"
+
 import * as pcss from "./postcss"
 
 import { format } from "./timer"
@@ -27,6 +29,19 @@ export function plugins (ctx : Compilation) {
 			sourceMap: true,
 			minimize: !ctx.config.dev,
 			plugins: pcss.plugins(ctx),
+			parser: "sugarss",
+		}),
+		url({
+			limit: 0,
+			emitFiles: true,
+			include: [
+				"**/*.svg",
+				"**/*.png",
+				"**/*.jpg",
+				"**/*.jpeg",
+				"**/*.ttf",
+				"**/*.woff",
+			],
 		}),
 	]
 }

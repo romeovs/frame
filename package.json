@@ -58,6 +58,7 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-postcss": "^2.0.3",
     "rollup-plugin-terser": "^5.1.2",
+    "rollup-plugin-url": "^3.0.0",
     "sharp": "^0.23.2",
     "source-map-support": "^0.5.16",
     "style-loader": "^1.0.0",
