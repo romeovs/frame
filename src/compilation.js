@@ -66,6 +66,9 @@ export class Compilation {
 	}
 
 	get cachedir () : string {
+		if (this.config.cache) {
+			return path.resolve(this.config.cache)
+		}
 		return path.resolve(this.config.root, ".frame_cache")
 	}
 

@@ -51,6 +51,11 @@ async function main () {
 				type: "integer",
 				description: "The port to listen on in watch and serve mode",
 			})
+			.option("cache", {
+				type: "string",
+				alias: "C",
+				description: "The location of the cache dir",
+			})
 			.help()
 			.argv
 
@@ -62,6 +67,7 @@ async function main () {
 	const ctx = new Compilation({
 		root: path.resolve(args.root),
 		output: args.output || path.resolve(args.root, "dist"),
+		cache: args.cache || path.resolve(args.root, ".frame_cache"),
 		dev: args.dev || args.watch,
 		loglevel: args.verbosity,
 		colors: args.colors,
