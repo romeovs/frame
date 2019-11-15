@@ -155,22 +155,29 @@ export class Compilation {
 
 			// Changing the entrypoints will trigger a client build
 			e = await entrypoints(ctx, m)
+
+			// Add new files to be watched
+			assets.add([
+				...m.globs,
+				...m.assets,
+			])
 		}
 
-		await rebuild()
 
 		// TODO: find a way to refresh when props change
 
 		const assets = chokidar.watch([
 			ctx.framefile,
-			...m.globs,
-			...m.assets,
+			...m?.globs || [],
+			...m?.assets || [],
 		], {
 			ignoreInitial: true,
 		})
 		assets.on("change", rebuild)
 		assets.on("add", rebuild)
 		assets.on("unlink", rebuild)
+
+		await rebuild()
 
 		const x = {
 			modern: null,
