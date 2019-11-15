@@ -1,6 +1,9 @@
+import * as React from "react"
 import path from "path"
 import Glob from "glob"
 import { type RouteDef } from "../manifest"
+import { context } from "./shared"
+export { useFrame } from "./shared"
 
 export function glob (...segments : string[]) : string[] {
 	const pat = path.join(...segments)
@@ -28,5 +31,11 @@ export function combine (acc : {[string] : RouteDef }, next : {[string] : RouteD
 }
 
 export function init (Component) {
-	return Component
+	return function (props) {
+		return (
+			<context.Provider value={global._frame_context}>
+				<Component {...props} />
+			</context.Provider>
+		)
+	}
 }

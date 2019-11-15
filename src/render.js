@@ -30,14 +30,14 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 	const legacy = js.legacy.find(f => f.id === route.id)?.src
 	const css = (js.modern || js.legacy).filter(f => f.type === "css")
 
+	global._frame_context = {
+		globals: manifest.globals,
+	}
+
 	let body = ""
 	if (server) {
 		const Component = require(server)
-		body = DOM.renderToString(
-			<context.Provider value={{ globals: manifest.globals }}>
-				<Component {...route.props} />
-			</context.Provider>,
-		)
+		body = DOM.renderToString(<Component {...route.props} />)
 	}
 
 	const pcss =

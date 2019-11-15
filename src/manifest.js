@@ -61,7 +61,11 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	const globs = new Set()
 	global._frame_glob = globs.add.bind(globs)
 
-	const defs = await cfg.routes()
+	const [ defs, globals ] = await Promise.all([
+		run(cfg.routes),
+		run(cfg.globals),
+	])
+
 	const routes = {}
 	for (const def of defs) {
 		const { url, component, props } = def
@@ -76,7 +80,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	const m : Manifest = {
 		root: pth,
 		...cfg,
-		globals: typeof cfg.globals === "function" ? await cfg.globals() : cfg.globals,
+		globals,
 		routes,
 		assets: Array.from(assets),
 		globs: Array.from(globs),
@@ -85,4 +89,11 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	m.globalsFile = await ctx.write("/g.json", JSON.stringify(m.globals), true)
 	await ctx.writeCache("manifest.json", JSON.stringify(m))
 	return m
+}
+
+function run (fn) {
+	if (typeof fn === "function") {
+		return fn()
+	}
+	return fn
 }
