@@ -11,7 +11,8 @@ log_no_color = \033[0m
 m = printf "$(log_color)$(log_name)$(log_no_color) %s$(log_no_color)\n"
 
 SRC_FILES = $(shell find src -name "*.js")
-EXM_FILES = $(shell find example -type "f")
+EXM_FILES = $(shell find example -type f  | grep -v example/dist | grep -v example/.frame_cache)
+ES_DIST = $(patsubst src/%.js,dist/es/%.js,$(SRC_FILES))
 
 list:
 	@$m "Listing deps..."
@@ -20,22 +21,36 @@ list:
 	@echo "example src:"
 	@echo $(EXM_FILES) | xargs -n1 -- echo "  "
 
-cli: lib dist/cli.js
+cli: dist/cli.js
+es: $(ES_DIST)
 
-dist/cli.js: $(SRC_FILES) rollup.config.js lib
+dist/cli.js: $(ES_DIST) $(SRC_FILES) rollup.config.js
 	@$m "Building cli..."
 	@$(ROLLUP) -c
 
-lib: $(SRC_FILES)
-	@rm -rf dist/lib
-	@cp -r src dist/lib
+dist/es/%.js: src/%.js
+	@mkdir -p `dirname $@`
+	@cp $< $@
 
 lint:
 	@$m "Linting..."
 	@$(ESLINT) --ext .js --ext .jsx --ext .ts --ext .tsx src
 
-example: ./dist/cli.js $(EXM_FILES)
-	@./dist/cli.js
+.PHONY: example
+example: $(EXM_FILES) cli
+	@./dist/cli.js build -r example -v debug
 
-serve:
-	@cd example/dist && http-server
+.PHONY: example.dev
+example.dev: $(EXM_FILES) cli
+	@./dist/cli.js build -r example -v debug --dev
+
+.PHONY: example.serve
+example.serve:
+	@./dist/cli.js serve -r example -v debug
+
+.PHONY: example.watch
+example.watch:
+	@./dist/cli.js watch -r example -v debug
+
+example.clean:
+	@rm -r example/dist/js
