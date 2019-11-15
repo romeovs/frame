@@ -6,6 +6,7 @@ import url from "rollup-plugin-url"
 import * as pcss from "./postcss"
 
 import { format } from "./timer"
+import { jspath } from "./constants"
 
 type Timings = {
 	string : [ number, number, number ],
@@ -41,7 +42,9 @@ export function plugins (ctx : Compilation) {
 				"**/*.jpeg",
 				"**/*.ttf",
 				"**/*.woff",
+				"**/*.eot",
 			],
+			publicPath: `/${jspath}/`,
 		}),
 	]
 }
