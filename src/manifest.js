@@ -76,6 +76,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	const m : Manifest = {
 		root: pth,
 		...cfg,
+		globals: typeof cfg.globals === "function" ? await cfg.globals() : cfg.globals,
 		routes,
 		assets: Array.from(assets),
 		globs: Array.from(globs),
