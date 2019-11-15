@@ -35,9 +35,15 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 	}
 
 	let body = ""
+	let head = []
 	if (server) {
-		const Component = require(server)
+		const [ Component, head_ ] = require(server)
 		body = DOM.renderToString(<Component {...route.props} />)
+		head = head_.map((tag, i) => (
+			<React.Fragment key={i}>
+				{tag}
+			</React.Fragment>
+		))
 	}
 
 	const pcss =
@@ -57,6 +63,7 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 			cssfiles={css.map(asset => asset.src)}
 			propsfile={propsfile}
 			globalsfile={manifest.globalsFile}
+			head={head}
 		/>,
 	)
 

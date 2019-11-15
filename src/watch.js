@@ -101,7 +101,7 @@ function config (ctx : Compilation, entrypoints : Entrypoints) {
 					loader: "babel-loader",
 					options: {
 						cacheDirectory: true,
-						...babel(ctx, false, false),
+						...babel(ctx, false, true),
 					},
 				},
 			}, {

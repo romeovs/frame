@@ -2,18 +2,19 @@ import * as React from "react"
 
 export function HTML (props : HTMLProps) : React.Node {
 	/* elsint-disable react/forbid-dom-props */
-	const { body, modern, legacy, system, propsfile, css, cssfiles, globalsfile } = props
+	const { body, modern, legacy, system, propsfile, css, cssfiles, globalsfile, head } = props
 
 	return (
 		<html>
 			<head>
 				<meta charSet="utf-8" />
-				<link rel="icon" href="data:," />
+				{modern && <script defer type="module" src={modern} />}
+				{legacy && system && <script defer noModule src={system} />}
+				{head}
 				{css && <style>{css}</style>}
 				{propsfile && <link id="frameprops" href={propsfile} rel="prefetch" />}
 				{globalsfile && <link id="frameglobals" href={globalsfile} rel="prefetch" />}
-				{modern && <script defer type="module" src={modern} />}
-				{legacy && system && <script defer noModule src={system} />}
+				<link rel="icon" href="data:," />
 			</head>
 			<body>
 				<div id="app" dangerouslySetInnerHTML={{ __html: body }} />

@@ -1,5 +1,7 @@
 import React from "react"
 import DOM from "react-dom"
+import { HeadProvider } from "react-head"
+
 import { decompress } from "../compress"
 import { context } from "./shared"
 
@@ -14,7 +16,9 @@ export async function init (Component, dev) {
 	const ctx = { globals }
 	const comp = (
 		<context.Provider value={ctx}>
-			<Component {...props} />
+			<HeadProvider>
+				<Component {...props} />
+			</HeadProvider>
 		</context.Provider>
 	)
 

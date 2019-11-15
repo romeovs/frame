@@ -1,6 +1,8 @@
 import * as React from "react"
 import path from "path"
 import Glob from "glob"
+import { HeadProvider } from "react-head"
+
 import { type RouteDef } from "../manifest"
 import { context } from "./shared"
 export { useFrame } from "./shared"
@@ -31,11 +33,16 @@ export function combine (acc : {[string] : RouteDef }, next : {[string] : RouteD
 }
 
 export function init (Component) {
-	return function (props) {
+	const head = []
+	const Comp = function (props) {
 		return (
 			<context.Provider value={global._frame_context}>
-				<Component {...props} />
+				<HeadProvider headTags={head}>
+					<Component {...props} />
+				</HeadProvider>
 			</context.Provider>
 		)
 	}
+
+	return [ Comp, head ]
 }
