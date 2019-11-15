@@ -44,6 +44,7 @@ export type Manifest = {
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {
+	ctx.log("Collecting assets and routes")
 	const pth = path.resolve(ctx.config.root, "frame.js")
 	const cfg = await load(pth)
 
