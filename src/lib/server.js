@@ -9,8 +9,7 @@ export function glob (...segments : string[]) : string[] {
 }
 
 export function asset (path : string) : mixed {
-	global._frame_asset(path)
-	return []
+	return global._frame_asset(path)
 }
 
 export function Route (component : string, props : {[string] : mixed}) : RouteDef {

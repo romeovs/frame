@@ -2,6 +2,8 @@ import path from "path"
 import { type Compilation } from "./compilation"
 import { load } from "./config"
 import { hash } from "./hash"
+import { asset } from "./assets"
+
 
 type RouteDef = {
 	component : string,
@@ -46,13 +48,17 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	const cfg = await load(pth)
 
 	const assets = new Set()
-	global._frame_asset = assets.add.bind(assets)
+	global._frame_asset = function (fname : string) {
+		const filename = path.resolve(ctx.config.root, fname)
+		assets.add(filename)
+		return asset(ctx, cfg, filename)
+	}
 
 	const globs = new Set()
 	global._frame_glob = globs.add.bind(globs)
 
 
-	const routes = cfg.routes()
+	const routes = await cfg.routes()
 	for (const url in routes) {
 		const route = routes[url]
 		route.id = hash(path.resolve(ctx.config.root, route.component))
