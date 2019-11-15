@@ -6,6 +6,8 @@ import fs from "./fs"
 import { type Config } from "./config"
 import { ColorfulLogger, LeveledLogger, NoopLogger, SimpleLogger } from "./log"
 import { hash } from "./hash"
+import { cache } from "./cache"
+import Timer from "./timer"
 
 import { manifest } from "./manifest"
 // import { client, watch as watchClient } from "./client"
@@ -111,6 +113,11 @@ export class Compilation {
 		await fs.writeFile(fname, content)
 
 		return fname
+	}
+
+	// Cache a function call.
+	cache (key : string | string[], fn : () => mixed) : Promise<mixed> {
+		return cache(this, key, fn)
 	}
 
 	async build () {
