@@ -37,6 +37,7 @@ export function config (ctx : Compilation, server : boolean, modern : boolean) {
 		plugins: [
 			"babel-plugin-transform-dirname-filename",
 			"@babel/plugin-syntax-dynamic-import",
+			"@babel/plugin-proposal-optional-chaining",
 			[
 				"babel-plugin-module-resolver",
 				{
