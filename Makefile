@@ -3,6 +3,7 @@ BIN = ./node_modules/.bin
 
 ROLLUP = $(BIN)/rollup
 ESLINT = $(BIN)/eslint
+BABEL = $(BIN)/babel
 
 # Logging helpers
 log_color = \033[34m
@@ -29,8 +30,7 @@ dist/cli.js: $(ES_DIST) $(SRC_FILES) rollup.config.js
 	@$(ROLLUP) -c
 
 dist/es/%.js: src/%.js
-	@mkdir -p `dirname $@`
-	@cp $< $@
+	babel $< -o $@
 
 lint:
 	@$m "Linting..."
