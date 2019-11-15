@@ -10,13 +10,13 @@ import { cache } from "./cache"
 import Timer from "./timer"
 
 import { manifest } from "./manifest"
-// import { client, watch as watchClient } from "./client"
 import { client } from "./client"
 import { watch as watchClient } from "./watch"
 import { server } from "./server"
 import { entrypoints } from "./entrypoints"
 import { render } from "./render"
 import { system } from "./system"
+import { serve } from "./serve"
 
 export class Compilation {
 	constructor (config : Config, cli : boolean = false) {
@@ -185,5 +185,9 @@ export class Compilation {
 				ctx.log("Done!")
 			}
 		})
+	}
+
+	serve () {
+		serve(this)
 	}
 }
