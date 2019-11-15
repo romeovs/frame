@@ -1,26 +1,38 @@
 import React from "react"
 import DOM from "react-dom"
 import { decompress } from "../compress"
+import { context } from "./shared"
+
+export { useFrame } from "./shared"
 
 export async function init (Component, dev) {
-	const props = await getprops()
+	const [ props, globals ] = await Promise.all([
+		getlink("frameprops"),
+		getlink("frameglobals"),
+	])
+
+	const ctx = { globals }
+	const comp = (
+		<context.Provider value={ctx}>
+			<Component {...props} />
+		</context.Provider>
+	)
 
 	if (process.env.NODE_ENV === "development") {
 		console.log("This page is rendered with Frame.js")
-		DOM.render(
-			<Component {...props} />,
-			document.getElementById("app"),
-		)
+		DOM.render(comp, document.getElementById("app"))
 	} else {
-		DOM.hydrate(
-			<Component {...props} />,
-			document.getElementById("app"),
-		)
+		DOM.hydrate(comp, document.getElementById("app"))
 	}
 }
 
-async function getprops () : {[string] : mixed } {
-	const url = document.getElementById("frameprops").href
+async function getlink (id : string) : {[string] : mixed } {
+	const url = document.getElementById(id)?.href
+	if (!url) {
+		return {}
+	}
+
 	const resp = await fetch(url)
 	return decompress(await resp.json())
 }
+

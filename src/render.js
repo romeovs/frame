@@ -4,6 +4,7 @@ import DOM from "react-dom/server"
 import { HTML } from "./html"
 import { purge } from "./purge-css"
 import { minify } from "./min-html"
+import { context } from "./lib/shared"
 
 type JS = {
 	modern : JSMap,
@@ -17,13 +18,13 @@ export async function render (ctx : Compilation, manifest : Manifest, js : JS) {
 	const promises = []
 	for (const url in manifest.routes) {
 		const route = manifest.routes[url]
-		promises.push(one(ctx, js, route))
+		promises.push(one(ctx, manifest, js, route))
 	}
 
 	await Promise.all(promises)
 }
 
-async function one (ctx : Compilation, js : JS, route : RouteDef) {
+async function one (ctx : Compilation, manifest : Manifest, js : JS, route : RouteDef) {
 	const server = js.server.find(f => f.id === route.id)?.src
 	const modern = js.modern.find(f => f.id === route.id)?.src
 	const legacy = js.legacy.find(f => f.id === route.id)?.src
@@ -32,7 +33,11 @@ async function one (ctx : Compilation, js : JS, route : RouteDef) {
 	let body = ""
 	if (server) {
 		const Component = require(server)
-		body = DOM.renderToString(<Component {...route.props} />)
+		body = DOM.renderToString(
+			<context.Provider value={{ globals: manifest.globals }}>
+				<Component {...route.props} />
+			</context.Provider>,
+		)
 	}
 
 	const pcss =
@@ -51,6 +56,7 @@ async function one (ctx : Compilation, js : JS, route : RouteDef) {
 			css={pcss}
 			cssfiles={css.map(asset => asset.src)}
 			propsfile={propsfile}
+			globalsfile={manifest.globalsFile}
 		/>,
 	)
 
