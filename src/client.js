@@ -1,6 +1,6 @@
 import path from "path"
 
-import { rollup, watch as Watch } from "rollup"
+import { rollup } from "rollup"
 import resolve from "rollup-plugin-node-resolve"
 import commonjs from "rollup-plugin-commonjs"
 import replace from "@rollup/plugin-replace"
@@ -8,7 +8,7 @@ import { terser } from "rollup-plugin-terser"
 
 import Timer from "./timer"
 import { babel } from "./babel"
-import { print, plugins, WrapWatcher } from "./shared"
+import { print, plugins } from "./shared"
 import { jspath } from "./constants"
 
 type JSMap = {
@@ -53,39 +53,6 @@ function marshal (ctx, output) {
 				}
 			})
 	)
-}
-
-export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints) {
-	const modern = true
-
-	ctx.log("Watching client (modern=%s)", modern)
-
-	const js = entrypoints.map(e => e.entrypoint)
-	const cfg = config(ctx, modern, js)
-
-	const watcher = Watch(cfg)
-	const evts = new WrapWatcher(watcher)
-
-	watcher.on("event", async function (evt) {
-		switch (evt.code) {
-		case "START":
-			ctx.log("Building client (modern=%s)", modern)
-			break
-		case "BUNDLE_END": {
-			const bundle = evt.result
-			const timings = bundle.getTimings()
-			print(ctx, "Client bundle", timings)
-
-			const { output } = await bundle.generate(cfg.output)
-			await bundle.write(cfg.output)
-			ctx.log("Client built (modern=%s) (%sms)", modern, evt.duration)
-
-			evts.emit("build", marshal(ctx, output))
-		}
-		}
-	})
-
-	return evts
 }
 
 const extensions = [
