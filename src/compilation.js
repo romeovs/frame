@@ -165,7 +165,9 @@ export class Compilation {
 			ctx.framefile,
 			...m.globs,
 			...m.assets,
-		])
+		], {
+			ignoreInitial: true,
+		})
 		assets.on("change", rebuild)
 		assets.on("add", rebuild)
 		assets.on("unlink", rebuild)
