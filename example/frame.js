@@ -29,6 +29,7 @@ export default {
 		return [
 			...await Promise.all(bars),
 			Route("/foo", "./components/foo"),
+			Route("/", "./components/foo"),
 		]
 	},
 }

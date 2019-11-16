@@ -86,6 +86,8 @@ export class Compilation {
 			fname = `${base}.${await hash(content)}${ext}`
 		}
 
+		fname = fname.replace(/\/\//g, "/")
+
 		this.log("Writing %s", fname)
 
 		await Promise.all([
