@@ -25,7 +25,7 @@ export default async function image (ctx : Compilation, manifest : Manifest, fil
 		css,
 	] = await Promise.all([
 		immatrix(ctx, manifest, metadata, filename),
-		ctx.cache([ filename, "gip" ], () => gip(filename)),
+		manifest.images.gip ? ctx.cache([ filename, "gip" ], () => gip(filename)) : {},
 	])
 
 	return {

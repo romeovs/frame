@@ -14,6 +14,7 @@ type RouteDef = {
 type ImageFormat = "jpeg" | "webp" | "png" | "tiff" | "gif"
 
 type ImageConfig = {
+	gip : boolean,
 	sizes : number[],
 	formats : {
 		[ImageFormat | "*"] : ImageFormat[],
