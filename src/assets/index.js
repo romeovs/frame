@@ -7,6 +7,7 @@ import json from "./json"
 import yaml from "./yaml"
 
 import Timer from "../timer"
+import { hash } from "../hash"
 
 // The type of asset handler functions
 type Handler = (ctx : Compilation, filename : string) => Promise<?Asset>
@@ -53,6 +54,7 @@ export async function asset (ctx : Compilation, manifest : Manifest, filename : 
 
 	return {
 		...r,
-		filename: filename.replace(path.resolve(ctx.config.root), ""),
+		// filename: filename.replace(path.resolve(ctx.config.root), ""),
+		id: hash(filename),
 	}
 }
