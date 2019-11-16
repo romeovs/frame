@@ -28,7 +28,7 @@ export async function client (ctx : Compilation, manifest : Manifest, entrypoint
 	print(ctx, "Client bundle", timings)
 
 	const { output } = await bundle.generate(cfg.output)
-	await bundle.write(cfg.output)
+	await write(ctx, output)
 	ctx.log("Client built (modern=%s) (%s)", modern, timer)
 
 	return marshal(ctx, output)
@@ -99,4 +99,27 @@ function config (ctx : Compilation, modern : boolean, js : string[]) : mixed {
 			ctx.config.dev ? {} : terser(),
 		],
 	}
+}
+
+// Write the bundle to disk
+async function write (ctx : Compilation, output : mixed) {
+	const promises = []
+
+	for (const chunk of output) {
+		ctx.debug("Writing client file %s", chunk.fileName)
+
+		if (chunk.isAsset) {
+			promises.push(ctx.write(`/${jspath}/${chunk.fileName}`, chunk.source))
+		}
+
+		let comment = ""
+		if (chunk.map) {
+			comment = `//# sourceMappingURL=/${jspath}/${chunk.fileName}.map`
+			promises.push(ctx.write(`/${jspath}/${chunk.fileName}.map`, chunk.map.toString()))
+		}
+
+		promises.push(ctx.write(`/${jspath}/${chunk.fileName}`, chunk.code + comment))
+	}
+
+	await Promise.all(promises)
 }
