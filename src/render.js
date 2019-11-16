@@ -5,6 +5,8 @@ import { HTML } from "./html"
 import { purge } from "./purge-css"
 import { minify } from "./min-html"
 import { context } from "./lib/shared"
+import { compress } from "./compress"
+import { mapv } from "./map"
 
 type JS = {
 	modern : JSMap,
@@ -51,7 +53,7 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 			? css.map(asset => asset.content).join(" ")
 			: purge(ctx, body, css)
 
-	const propsfile = await ctx.write(`${route.url}/p.json`, JSON.stringify(route.props), true)
+	const propsfile = await ctx.write(`${route.url}/p.json`, JSON.stringify(mapv(route.props, v => compress(v))), true)
 
 	const markup = DOM.renderToStaticMarkup(
 		<HTML

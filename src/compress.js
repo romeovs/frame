@@ -62,6 +62,9 @@ function infl (key : string) : string {
 // Compress a single asset by renaming its keys and well-known values
 // using a predefined dictionary.
 export function compress (asset : Asset) : CompressedAsset {
+	if (Array.isArray(asset)) {
+		return asset.map(el => compress(el))
+	}
 	const r = mapk(asset, defl)
 	return mapv(r, defl)
 }
@@ -69,6 +72,9 @@ export function compress (asset : Asset) : CompressedAsset {
 // Deompress a single asset by renaming its keys and well-known values
 // using the predefined dictionary.
 export function decompress (asset : CompressedAsset) : Asset {
+	if (Array.isArray(asset)) {
+		return asset.map(el => decompress(el))
+	}
 	const r = mapk(asset, infl)
 	return mapv(r, infl)
 }
