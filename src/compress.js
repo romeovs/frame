@@ -50,35 +50,6 @@ for (const i in strings) {
 	reverse[to] = from
 }
 
-// A list of custom compressors, by asset type
-const customCompress = {
-	stylesheet (asset : Asset) : mixed {
-		const names = {}
-		for (const name in asset.names) {
-			const value = asset.names[name]
-			const suffix = value.replace(new RegExp(`^${name}_`), "")
-			names[name] = suffix
-		}
-		asset.names = names
-		return asset
-	},
-}
-
-// A list of custom decompressors, by asset type
-const customDecompress = {
-	stylesheet (asset : mixed) : Asset {
-		const names = {}
-		for (const name in asset.names) {
-			const short = asset.names[name]
-			const value = short.startsWith(`${name}_`) ? short : `${name}_${short}`
-			names[name] = value
-		}
-		asset.names = names
-		return asset
-	},
-}
-
-// Deflate keys using simple alphabet
 function defl (key : string) : string {
 	return dictionary[key] || key
 }
@@ -91,8 +62,7 @@ function infl (key : string) : string {
 // Compress a single asset by renaming its keys and well-known values
 // using a predefined dictionary.
 export function compress (asset : Asset) : CompressedAsset {
-	const a = asset.type in customCompress ? customCompress[asset.type]({ ...asset }) : asset
-	const r = mapk(a, defl)
+	const r = mapk(asset, defl)
 	return mapv(r, defl)
 }
 
@@ -100,8 +70,7 @@ export function compress (asset : Asset) : CompressedAsset {
 // using the predefined dictionary.
 export function decompress (asset : CompressedAsset) : Asset {
 	const r = mapk(asset, infl)
-	const a = mapv(r, infl)
-	return a.type in customDecompress ? customDecompress[a.type]({ ...a }) : a
+	return mapv(r, infl)
 }
 
 // Compress all assets.
