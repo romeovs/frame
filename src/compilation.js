@@ -17,6 +17,8 @@ import { entrypoints } from "./entrypoints"
 import { render } from "./render"
 import { system } from "./system"
 import { serve } from "./serve"
+import { gzip } from "./gzip"
+import { brotli } from "./brotli"
 
 export class Compilation {
 	constructor (config : Config, cli : boolean = false) {
@@ -86,14 +88,12 @@ export class Compilation {
 			fname = `${base}.${await hash(content)}${ext}`
 		}
 
-		fname = fname.replace(/\/\//g, "/")
-
 		this.log("Writing %s", fname)
 
 		await Promise.all([
 			this._writeFile(fname, content),
-			// gzip(this, fname, content),
-			// brotli(this, fname, content),
+			gzip(this, fname, content),
+			brotli(this, fname, content),
 		])
 
 		return fname
@@ -101,7 +101,7 @@ export class Compilation {
 
 	// Write a file to the output folder
 	async _writeFile (filename : string, content : string | Buffer) {
-		const fn = path.resolve(this.outputdir, filename.replace(/^\//, ""))
+		const fn = path.resolve(this.outputdir, filename.replace(/\/\//g, "/").replace(/^\//, ""))
 		const dir = path.dirname(fn)
 
 		await fs.mkdir(dir, { recursive: true })
@@ -109,7 +109,7 @@ export class Compilation {
 	}
 
 	async writeCache (filename : string, content : string | Buffer) : Promise<string> {
-		const fname = path.resolve(this.cachedir, filename.replace(/^\//, ""))
+		const fname = path.resolve(this.cachedir, filename.replace(/\/\//g, "/").replace(/^\//, ""))
 		const dir = path.dirname(fname)
 
 		this.debug("Writing cache %s", fname)
