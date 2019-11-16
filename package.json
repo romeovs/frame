@@ -1,7 +1,6 @@
 {
-  "name": "frame2",
-  "version": "1.0.0",
-  "main": "index.js",
+  "name": "frame",
+  "version": "0.0.1",
   "license": "MIT",
   "bin": {
     "frame": "dist/cli.js"
