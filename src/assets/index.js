@@ -5,6 +5,7 @@ import { type Compilation } from "../compilation"
 import image from "./image"
 import json from "./json"
 import yaml from "./yaml"
+import markdown from "./markdown"
 
 import Timer from "../timer"
 import { hash } from "../hash"
@@ -12,13 +13,6 @@ import { hash } from "../hash"
 // The type of asset handler functions
 type Handler = (ctx : Compilation, filename : string) => Promise<?Asset>
 
-// export async function assets (ctx : Compilation, manifest : Manifest) {
-// 	const timer = new Timer()
-//
-// 	ctx.log("Processing assets")
-// 	await Promise.all(manifest.assets.map(a => asset(ctx, a)))
-// 	ctx.log("Assets processed (%s)", timer)
-// }
 
 // Asset handlers by extension
 const handlers = {
@@ -28,6 +22,7 @@ const handlers = {
 	json,
 	yaml,
 	yml: yaml,
+	md: markdown,
 }
 
 function extension (filename : string) : string {
