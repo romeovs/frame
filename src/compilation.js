@@ -90,22 +90,25 @@ export class Compilation {
 
 		this.log("Writing %s", fname)
 
-		await Promise.all([
+		const [ fn ] = await Promise.all([
 			this._writeFile(fname, content),
 			gzip(this, fname, content),
 			brotli(this, fname, content),
 		])
 
-		return fname
+		return fn
 	}
 
 	// Write a file to the output folder
 	async _writeFile (filename : string, content : string | Buffer) {
-		const fn = path.resolve(this.outputdir, filename.replace(/\/\//g, "/").replace(/^\//, ""))
+		const base = filename.replace(/\/\//g, "/").replace(/^\//, "")
+		const fn = path.resolve(this.outputdir, base)
 		const dir = path.dirname(fn)
 
 		await fs.mkdir(dir, { recursive: true })
 		await fs.writeFile(fn, content)
+
+		return `/${base}`
 	}
 
 	async writeCache (filename : string, content : string | Buffer) : Promise<string> {
