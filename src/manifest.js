@@ -1,4 +1,6 @@
 import path from "path"
+import glob from "glob"
+
 import { type Compilation } from "./compilation"
 import { load } from "./config"
 import { hash } from "./hash"
@@ -60,7 +62,11 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	}
 
 	const globs = new Set()
-	global._frame_glob = globs.add.bind(globs)
+	global._frame_glob = function (...segments : string[]) : string[] {
+		const pat = path.resolve(ctx.config.root, ...segments)
+		globs.add(pat)
+		return glob.sync(pat)
+	}
 
 	const [ defs, globals ] = await Promise.all([
 		run(cfg.routes),

@@ -1,6 +1,5 @@
 import * as React from "react"
 import path from "path"
-import Glob from "glob"
 import { HeadProvider } from "react-head"
 
 import { type RouteDef } from "../manifest"
@@ -8,9 +7,7 @@ import { context } from "./shared"
 export { useFrame } from "./shared"
 
 export function glob (...segments : string[]) : string[] {
-	const pat = path.join(...segments)
-	global._frame_glob(pat)
-	return Glob.sync(pat)
+	return global._frame_glob(...segments)
 }
 
 export function asset (path : string) : mixed {

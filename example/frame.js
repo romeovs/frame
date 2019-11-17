@@ -17,7 +17,7 @@ export default {
 	},
 	async routes () : RouteDef {
 		const bars =
-			glob(__dirname, "bar/*.yml")
+			glob("bar/*.yml")
 				.map(async function (pth : string) : RouteDef {
 					const url = `/bar/${path.basename(pth).replace(".yml", "")}`
 
