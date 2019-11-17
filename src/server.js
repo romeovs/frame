@@ -47,7 +47,6 @@ function marshal (ctx : Compilation, output : mixed) : Assets {
 
 function config (ctx : Compilation, js : string[]) : mixed {
 	/* eslint-disable global-require */
-
 	const pkg = require(path.resolve(__dirname, "../package.json"))
 	const deps = Object.keys(pkg.dependencies || {})
 	const peers = Object.keys(pkg.peerDependencies || {})

@@ -50,7 +50,7 @@ export type Manifest = {
 export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	ctx.log("Collecting assets and routes")
 	const pth = path.resolve(ctx.config.root, "frame.js")
-	const cfg = await load(pth)
+	const cfg = await load(ctx, pth)
 
 	const assets = new Set()
 	global._frame_asset = function (fname : string) {

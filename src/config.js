@@ -4,7 +4,7 @@ import { rollup } from "rollup"
 
 import { babel } from "./babel"
 
-export async function load (filename : string) {
+export async function load (ctx : Compilation, filename : string) {
 	const warnings = []
 	const bundle = await rollup({
 		input: filename,
@@ -13,7 +13,7 @@ export async function load (filename : string) {
 		},
 		treeshake: false,
 		onwarn: warnings.push,
-		plugins: [ babel({}, true, false) ],
+		plugins: [ babel(ctx, true, false) ],
 	})
 
 	const output = await bundle.generate({
