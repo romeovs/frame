@@ -29,6 +29,7 @@
     "@babel/template": "^7.7.0",
     "@rollup/plugin-replace": "^2.2.1",
     "babel-loader": "^8.0.6",
+    "babel-plugin-flow-react-proptypes": "^25.1.0",
     "babel-plugin-module-resolver": "^3.2.0",
     "babel-plugin-transform-dirname-filename": "^1.1.0",
     "base-x": "^3.0.7",

@@ -38,6 +38,7 @@ export function config (ctx : Compilation, server : boolean, modern : boolean) {
 			"babel-plugin-transform-dirname-filename",
 			"@babel/plugin-syntax-dynamic-import",
 			"@babel/plugin-proposal-optional-chaining",
+			...ctx.config.dev ? [] : [ "babel-plugin-flow-react-proptypes" ],
 			[
 				"babel-plugin-module-resolver",
 				{
