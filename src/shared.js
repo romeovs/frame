@@ -23,7 +23,7 @@ export function plugins (ctx : Compilation) {
 	return [
 		postcss({
 			modules: {
-				generateScopedName: pcss.generateScopedName,
+				generateScopedName: pcss.generateScopedName(ctx),
 			},
 			extract: true,
 			inject: true,

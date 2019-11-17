@@ -85,7 +85,9 @@ function config (ctx : Compilation, entrypoints : Entrypoints) {
 					loader: "css-loader",
 					options: {
 						importLoaders: 1,
-						modules: true,
+						modules: {
+							localIdentName: "[local]_[hash:base64:8]",
+						},
 					},
 				}, {
 					loader: "postcss-loader",

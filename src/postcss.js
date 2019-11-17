@@ -20,6 +20,7 @@ export function plugins (ctx : Compilation) : mixed {
 	]
 }
 
-export function generateScopedName (classname : string, filename : string, css : string) : string {
+export const generateScopedName = ctx => function (classname : string, filename : string, css : string) : string {
+	// TODO: can this be short in production?
 	return `${classname}_${hash(css.replace(/\s/g, ""))}`
 }
