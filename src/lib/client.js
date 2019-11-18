@@ -8,7 +8,11 @@ import { context } from "./shared"
 
 export { useFrame } from "./shared"
 
-export async function init (Component, dev) {
+import { type Asset } from "../assets"
+export type { Asset }
+
+
+export async function init (Component : React.AbstractComponent, dev : boolean) {
 	const [ cprops, globals ] = await Promise.all([
 		getlink("frameprops"),
 		getlink("frameglobals"),

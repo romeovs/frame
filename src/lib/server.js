@@ -3,8 +3,12 @@ import path from "path"
 import { HeadProvider } from "react-head"
 
 import { type RouteDef } from "../manifest"
+import { type Asset } from "../assets"
+
 import { context } from "./shared"
 export { useFrame } from "./shared"
+
+export type { Asset }
 
 export function glob (...segments : string[]) : string[] {
 	return global._frame_glob(...segments)
