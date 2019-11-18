@@ -7,7 +7,7 @@ import { type Config } from "./config"
 import { ColorfulLogger, LeveledLogger, NoopLogger, SimpleLogger } from "./log"
 import { hash } from "./hash"
 import { cache } from "./cache"
-import Timer from "./timer"
+import { Timer } from "./timer"
 
 import { manifest } from "./manifest"
 import { client } from "./client"

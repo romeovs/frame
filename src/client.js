@@ -6,7 +6,7 @@ import commonjs from "rollup-plugin-commonjs"
 import replace from "@rollup/plugin-replace"
 import { terser } from "rollup-plugin-terser"
 
-import Timer from "./timer"
+import { Timer } from "./timer"
 import { babel } from "./babel"
 import { print, plugins } from "./shared"
 import { jspath } from "./constants"

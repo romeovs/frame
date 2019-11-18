@@ -1,6 +1,6 @@
 import Brotli from "brotli"
 
-import Timer from "./timer"
+import { Timer } from "./timer"
 
 const exts = [
 	".js",

@@ -1,7 +1,7 @@
 import process from "process"
 import printf from "printf"
 
-import Timer from "../timer"
+import { Timer } from "../timer"
 
 import { esc, color } from "./color"
 import { Logger } from "./base"

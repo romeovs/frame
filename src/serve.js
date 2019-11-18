@@ -1,6 +1,6 @@
 import express from "express"
 
-import Timer from "./timer"
+import { Timer } from "./timer"
 
 export function serve (ctx : Compilation) {
 	const port = ctx.config.port || 8080

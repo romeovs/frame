@@ -2,7 +2,7 @@ import process from "process"
 import printf from "printf"
 import { type Writable } from "stream"
 
-import Timer from "../timer"
+import { Timer } from "../timer"
 
 import { type Level } from "./level"
 import { Logger } from "./base"

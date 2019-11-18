@@ -4,7 +4,7 @@ import terser from "terser"
 
 import fs from "./fs"
 import { jspath } from "./constants"
-import Timer from "./timer"
+import { Timer } from "./timer"
 import { type Compilation } from "./compilation"
 import { type Asset } from "./assets"
 import { hash } from "./hash"

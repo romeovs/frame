@@ -5,7 +5,7 @@ import resolve from "rollup-plugin-node-resolve"
 import builtins from "builtin-modules"
 import commonjs from "rollup-plugin-commonjs"
 
-import Timer from "./timer"
+import { Timer } from "./timer"
 import { print, plugins } from "./shared"
 import { babel } from "./babel"
 

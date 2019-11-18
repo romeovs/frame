@@ -1,6 +1,6 @@
 import zopfli from "node-zopfli"
 
-import Timer from "./timer"
+import { Timer } from "./timer"
 
 const exts = [
 	".js",

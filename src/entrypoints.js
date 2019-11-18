@@ -4,7 +4,7 @@ import template from "@babel/template"
 import generate from "@babel/generator"
 
 import { hash } from "./hash"
-import Timer from "./timer"
+import { Timer } from "./timer"
 
 import { type Compilation } from "./compilation"
 import { type Manifest } from "./manifest"
