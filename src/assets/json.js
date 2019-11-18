@@ -1,13 +1,18 @@
 import fs from "../fs"
+import { hash } from "../hash"
 import { type Compilation } from "../compilation"
 
-import { type Asset } from "."
+export type JSONAsset = {
+	type : "json",
+	id : string,
+	content : mixed,
+}
 
-
-export default async function (ctx : Compilation, _ : Manifest, filename : string) : Promise<Asset> {
+export async function json (ctx : Compilation, _ : Manifest, filename : string) : Promise<JSONAsset> {
 	const content = await fs.readFile(filename)
 	return {
-		content: JSON.parse(content),
 		type: "json",
+		id: hash(filename),
+		content: JSON.parse(content),
 	}
 }

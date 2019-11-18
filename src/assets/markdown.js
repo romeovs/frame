@@ -2,15 +2,16 @@ import Markdown from "markdown-it"
 import YAML from "js-yaml"
 
 import { type Compilation } from "../compilation"
+import { hash } from "../hash"
 import fs from "../fs"
 
-type MarkdownAsset = {
+export type MarkdownAsset = {
 	type : "markdown",
 	html : string,
 	prematter : mixed,
 }
 
-export default async function markdown (ctx : Compilation, manifest : Manifest, filename : string) : MarkdownAsset {
+export async function markdown (ctx : Compilation, manifest : Manifest, filename : string) : Promise<MarkdownAsset> {
 	const content = await fs.readFile(filename, "utf-8")
 
 	const parts = content.split(/^---$/, 1)
@@ -27,6 +28,7 @@ export default async function markdown (ctx : Compilation, manifest : Manifest, 
 
 	return {
 		type: "markdown",
+		id: hash(filename),
 		html,
 		prematter: pre ? YAML.safeLoad(pre) : {},
 	}

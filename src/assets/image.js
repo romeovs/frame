@@ -8,13 +8,22 @@ import Timer from "../timer"
 import { impath } from "../constants"
 import { type Compilation } from "../compilation"
 
-import { type Asset } from "."
+export type ImageAsset = {
+	type : "image",
+	id : string,
+	width : number,
+	height : number,
+	formats : string[],
+	matrix : string[],
+	color : ?string,
+	gradient : ?string[],
+}
 
 type Metadata = {
 	width : number,
 }
 
-export default async function image (ctx : Compilation, manifest : Manifest, filename : string) : Promise<Asset> {
+export async function image (ctx : Compilation, manifest : Manifest, filename : string) : Promise<ImageAsset> {
 	const img = sharp(filename)
 	const metadata = await img.metadata()
 
@@ -30,6 +39,7 @@ export default async function image (ctx : Compilation, manifest : Manifest, fil
 
 	return {
 		type: "image",
+		id: hash(filename),
 		width: metadata.width,
 		height: metadata.height,
 		format: metadata.format,
