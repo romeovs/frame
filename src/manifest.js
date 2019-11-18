@@ -5,6 +5,7 @@ import { type Compilation } from "./compilation"
 import { load } from "./config"
 import { hash } from "./hash"
 import { asset } from "./assets"
+import { jspath } from "./constants"
 
 
 type RouteDef = {
@@ -93,7 +94,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		globs: Array.from(globs),
 	}
 
-	m.globalsFile = await ctx.write("/g.json", JSON.stringify(m.globals || {}), true)
+	m.globalsFile = await ctx.write(`/${jspath}/g.json`, JSON.stringify(m.globals || {}), true)
 	await ctx.writeCache("manifest.json", JSON.stringify(m))
 	return m
 }
