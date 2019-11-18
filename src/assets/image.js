@@ -85,7 +85,7 @@ async function imsrc (ctx : Compilation, manifest : Manifest, meta : Metadata, f
 	const existing = await exists(ctx, pfx, width, format)
 	if (existing) {
 		ctx.log("Skipping existing image %s", existing)
-		return `/${impath}/${existing}`
+		return existing
 	}
 
 	if (width !== meta.width) {
@@ -118,7 +118,7 @@ async function imsrc (ctx : Compilation, manifest : Manifest, meta : Metadata, f
 	const buf = await img.toBuffer()
 	const h = await hash(buf)
 
-	const src = `/${impath}/${pfx}.${width}.${h}.${format}`
+	const src = `/${impath}/${pfx}/${width}.${h}.${format}`
 	await ctx.write(src, buf)
 
 	ctx.log("Resized %s x%s %s (%s)", filename.replace(`${ctx.config.root}/`, ""), width, format, timer)
@@ -141,7 +141,12 @@ async function exists (ctx : Compilation, pfx : string, size : number | string, 
 		return null
 	}
 
-	const files = await fs.readdir(path.join(ctx.config.output, impath))
+	const files = await fs.readdir(path.join(ctx.config.output, impath, pfx))
 
-	return files.find(file => file.startsWith(`${pfx}.${size}.`) && file.endsWith(`.${format}`))
+	const found = files.find(file => file.startsWith(`${size}.`) && file.endsWith(`.${format}`))
+	if (!found) {
+		return null
+	}
+
+	return `/${impath}/${pfx}/${found}`
 }
