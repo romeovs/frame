@@ -6,13 +6,18 @@ import generate from "@babel/generator"
 import { hash } from "./hash"
 import Timer from "./timer"
 
+import { type Compilation } from "./compilation"
+import { type Manifest } from "./manifest"
+
 export type Entrypoint = {
 	id : string,
 	component : string,
 	entrypoint : string,
 }
 
-export async function entrypoints (ctx : Compilation, manifest : Manifest) : Entrypoints[] {
+export type Entrypoints = Entrypoint[]
+
+export async function entrypoints (ctx : Compilation, manifest : Manifest) : Entrypoints {
 	const timer = new Timer()
 
 	const promises = []

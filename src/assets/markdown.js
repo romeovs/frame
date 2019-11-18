@@ -1,9 +1,11 @@
 import Markdown from "markdown-it"
 import YAML from "js-yaml"
 
-import { type Compilation } from "../compilation"
 import { hash } from "../hash"
 import fs from "../fs"
+
+import { type Compilation } from "../compilation"
+import { type Manifest } from "../manifest"
 
 export type MarkdownAsset = {
 	type : "markdown",

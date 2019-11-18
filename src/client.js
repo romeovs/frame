@@ -11,6 +11,10 @@ import { babel } from "./babel"
 import { print, plugins } from "./shared"
 import { jspath } from "./constants"
 
+import { type Compilation } from "./compilation"
+import { type Manifest } from "./manifest"
+import { type Entrypoints } from "./entrypoints"
+
 type JSMap = {
 	id : string,
 	src : string,

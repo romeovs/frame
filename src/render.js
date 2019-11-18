@@ -8,6 +8,9 @@ import { context } from "./lib/shared"
 import { compress } from "./compress"
 import { mapv } from "./map"
 
+import { type Compilation } from "./compilation"
+import { type Manifest } from "./manifest"
+
 type JS = {
 	modern : JSMap,
 	legacy : JSMap,

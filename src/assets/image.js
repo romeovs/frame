@@ -6,7 +6,9 @@ import fs from "../fs"
 import { hash } from "../hash"
 import Timer from "../timer"
 import { impath } from "../constants"
+
 import { type Compilation } from "../compilation"
+import { type Manifest } from "../manifest"
 
 export type ImageAsset = {
 	type : "image",

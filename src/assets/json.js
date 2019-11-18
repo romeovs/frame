@@ -1,6 +1,8 @@
 import fs from "../fs"
 import { hash } from "../hash"
+
 import { type Compilation } from "../compilation"
+import { type Manifest } from "../manifest"
 
 export type JSONAsset = {
 	type : "json",

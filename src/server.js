@@ -9,6 +9,10 @@ import Timer from "./timer"
 import { print, plugins } from "./shared"
 import { babel } from "./babel"
 
+import { type Compilation } from "./compilation"
+import { type Manifest } from "./manifest"
+import { type Entrypoints } from "./entrypoints"
+
 const extensions = [
 	".js",
 ]

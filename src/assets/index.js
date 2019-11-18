@@ -1,6 +1,8 @@
 import path from "path"
 
 import { type Compilation } from "../compilation"
+import { type Manifest } from "../manifest"
+
 import Timer from "../timer"
 import { hash } from "../hash"
 
