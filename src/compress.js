@@ -11,7 +11,6 @@ const strings = [
 	"href",
 	"width",
 	"height",
-	"format",
 	"formats",
 	"matrix",
 	"color",
@@ -23,8 +22,6 @@ const strings = [
 	"filename",
 
 	// types
-	"javascript",
-	"stylesheet",
 	"image",
 	"json",
 ]
@@ -99,22 +96,6 @@ export function decompress (asset : CompressedAsset) : Asset {
 	}
 
 	return a
-}
-
-// Compress all assets.
-export function compressAll (assets : Assets) : Assets {
-	const r = mapv(assets, ({ id, ...asset }) => asset)
-	return mapv(r, compress)
-}
-
-// Decompress all assets.
-export function decompressAll (assets : Assets) : Assets {
-	const r = mapv(assets, decompress)
-	for (const id in r) {
-		r[id].id = id
-	}
-
-	return r
 }
 
 function format (str : string) : string {
