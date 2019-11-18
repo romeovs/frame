@@ -1,3 +1,2 @@
-export const jspath = "js"
-export const csspath = "cs"
-export const impath = "im"
+export const jspath = "_"
+export const impath = "_/im"
