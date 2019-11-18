@@ -66,7 +66,7 @@ export function compress (asset : Asset) : CompressedAsset {
 
 	let a = asset
 
-	if ("type" in asset && asset.type === "image") {
+	if (typeof asset === "object" && "type" in asset && asset.type === "image") {
 		a = {
 			...a,
 			matrix: a.matrix.map(x => x.replace(`/${impath}/${a.id.substring(0, 5)}/`, "")),
@@ -87,7 +87,7 @@ export function decompress (asset : CompressedAsset) : Asset {
 	const r = mapk(asset, infl)
 	let a = mapv(r, infl)
 
-	if ("type" in a && a.type === "image") {
+	if (typeof a === "object" && "type" in a && a.type === "image") {
 		a = {
 			...a,
 			matrix: a.matrix.map(x => `/${impath}/${a.id.substring(0, 5)}/${x}`),
