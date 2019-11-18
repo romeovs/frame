@@ -1,4 +1,5 @@
 import { mapk, mapv } from "./map"
+import { impath } from "./constants"
 
 type CompressedAsset = mixed
 
@@ -65,7 +66,18 @@ export function compress (asset : Asset) : CompressedAsset {
 	if (Array.isArray(asset)) {
 		return asset.map(el => compress(el))
 	}
-	const r = mapk(asset, defl)
+
+	let a = asset
+
+	if ("type" in asset && asset.type === "image") {
+		a = {
+			...a,
+			matrix: a.matrix.map(x => x.replace(`/${impath}/${a.id.substring(0, 5)}/`, "")),
+			formats: undefined,
+		}
+	}
+
+	const r = mapk(a, defl)
 	return mapv(r, defl)
 }
 
@@ -76,7 +88,17 @@ export function decompress (asset : CompressedAsset) : Asset {
 		return asset.map(el => decompress(el))
 	}
 	const r = mapk(asset, infl)
-	return mapv(r, infl)
+	let a = mapv(r, infl)
+
+	if ("type" in a && a.type === "image") {
+		a = {
+			...a,
+			matrix: a.matrix.map(x => `/${impath}/${a.id.substring(0, 5)}/${x}`),
+			formats: Array.from(new Set(a.matrix.map(format))),
+		}
+	}
+
+	return a
 }
 
 // Compress all assets.
@@ -93,4 +115,9 @@ export function decompressAll (assets : Assets) : Assets {
 	}
 
 	return r
+}
+
+function format (str : string) : string {
+	const parts = str.split(".")
+	return parts[parts.length - 1]
 }

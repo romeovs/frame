@@ -44,7 +44,6 @@ export async function image (ctx : Compilation, manifest : Manifest, filename : 
 		id: hash(filename),
 		width: metadata.width,
 		height: metadata.height,
-		format: metadata.format,
 		formats,
 		matrix,
 		color: css.background,
