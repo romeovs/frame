@@ -88,8 +88,6 @@ export class Compilation {
 			fname = `${base}.${await hash(content)}${ext}`
 		}
 
-		this.log("Writing %s", fname)
-
 		const [ fn ] = await Promise.all([
 			this._writeFile(fname, content),
 			gzip(this, fname, content),
@@ -104,6 +102,8 @@ export class Compilation {
 		const base = filename.replace(/\/\//g, "/").replace(/^\//, "")
 		const fn = path.resolve(this.outputdir, base)
 		const dir = path.dirname(fn)
+
+		this.log("Writing %s", `/${base}`)
 
 		await fs.mkdir(dir, { recursive: true })
 		await fs.writeFile(fn, content)
