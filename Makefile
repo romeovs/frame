@@ -30,7 +30,8 @@ dist/cli.js: $(ES_DIST) $(SRC_FILES) rollup.config.js
 	@$(ROLLUP) -c
 
 dist/es/%.js: src/%.js
-	babel $< -o $@
+	@$m "Building $<..."
+	@$(BABEL) $< -o $@
 
 lint:
 	@$m "Linting..."
