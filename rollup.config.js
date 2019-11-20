@@ -15,7 +15,7 @@ const deps = Object.keys(pkg.dependencies || {})
 const peers = Object.keys(pkg.peerDependencies || {})
 
 const base = {
-	treeshake: false,
+	treeshake: true,
 	external: [ ...deps, ...peers, "react-dom/server" ],
 	plugins: [
 		resolve({
