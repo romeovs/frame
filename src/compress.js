@@ -64,7 +64,7 @@ export function compress (asset : Asset) : CompressedAsset {
 		return asset.map(el => compress(el))
 	}
 
-	if (typeof asset !== "object") {
+	if (typeof asset !== "object" || asset === null) {
 		return asset
 	}
 
@@ -89,7 +89,7 @@ export function decompress (asset : CompressedAsset) : Asset {
 		return asset.map(el => decompress(el))
 	}
 
-	if (typeof asset !== "object") {
+	if (typeof asset !== "object" || asset === null) {
 		return asset
 	}
 
