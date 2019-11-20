@@ -64,6 +64,10 @@ export function compress (asset : Asset) : CompressedAsset {
 		return asset.map(el => compress(el))
 	}
 
+	if (typeof asset !== "object") {
+		return asset
+	}
+
 	let a = asset
 
 	if (typeof asset === "object" && "type" in asset && asset.type === "image") {
@@ -84,6 +88,11 @@ export function decompress (asset : CompressedAsset) : Asset {
 	if (Array.isArray(asset)) {
 		return asset.map(el => decompress(el))
 	}
+
+	if (typeof asset !== "object") {
+		return asset
+	}
+
 	const r = mapk(asset, infl)
 	let a = mapv(r, infl)
 
