@@ -46,8 +46,6 @@ export type Manifest = {
 	globals : {
 		[string] : mixed,
 	},
-
-	globalsFile : string,
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {
@@ -94,7 +92,6 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		globs: Array.from(globs),
 	}
 
-	m.globalsFile = await ctx.write(`/${jspath}/g.json`, JSON.stringify(m.globals || {}), true)
 	await ctx.writeCache("manifest.json", JSON.stringify(m))
 	return m
 }

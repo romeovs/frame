@@ -13,15 +13,15 @@ export type { Asset }
 
 
 export async function init (Component : React.AbstractComponent, dev : boolean) {
-	const [ cprops, globals ] = await Promise.all([
-		getlink("frameprops"),
-		getlink("frameglobals"),
-	])
+	const {
+		p: compressedProps,
+		g: compressedGlobals,
+	} = await getlink("frameprops")
 
-	const props = mapv(cprops, v => decompress(v))
-	const ctx = { globals }
+	const props = mapv(compressedProps, v => decompress(v))
+	const globals = mapv(compressedGlobals, v => decompress(v))
 	const comp = (
-		<context.Provider value={ctx}>
+		<context.Provider value={{ globals }}>
 			<HeadProvider>
 				<Component {...props} />
 			</HeadProvider>
@@ -43,6 +43,5 @@ async function getlink (id : string) : {[string] : mixed } {
 	}
 
 	const resp = await fetch(url)
-	return decompress(await resp.json())
+	return await resp.json()
 }
-

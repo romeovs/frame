@@ -57,7 +57,10 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 			? css.map(asset => asset.content).join(" ")
 			: purge(ctx, body, css)
 
-	const propsfile = await ctx.write(`/${jspath}/p.json`, JSON.stringify(mapv(route.props, v => compress(v))), true)
+	const propsfile = await ctx.write(`/${jspath}/p.json`, JSON.stringify({
+		p: mapv(route.props, v => compress(v)),
+		g: mapv(manifest.globals, v => compress(v)),
+	}), true)
 
 	const markup = DOM.renderToStaticMarkup(
 		<HTML
