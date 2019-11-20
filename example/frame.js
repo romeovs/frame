@@ -15,6 +15,9 @@ export default {
 			png: [ "png" ],
 		},
 	},
+	dictionary: [
+		"title",
+	],
 	async routes () : RouteDef {
 		const bars =
 			glob("bar/*.yml")

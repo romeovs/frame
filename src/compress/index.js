@@ -1,43 +1,22 @@
-import { mapk, mapv } from "../map"
-import { dictionary } from "./dictionary"
+import { mapkv } from "../map"
+import { inflate, deflate, type Dictionary } from "./dictionary"
 import * as image from "./image"
 
 type CompressedAsset = mixed
 
-const strings = [
-	// keys
-	"id",
-	"type",
-	"src",
-	"href",
-	"width",
-	"height",
-	"formats",
-	"matrix",
-	"color",
-	"gradient",
-	"content",
-	"names",
-	"inline",
-	"modules",
-	"filename",
-
-	// types
-	"image",
-	"json",
-]
-
-
-const dict = dictionary(strings)
 const custom = {
 	image,
 }
 
 // Compress a single asset by renaming its keys and well-known values
 // using a predefined dictionary.
-export function compress (asset : Asset) : CompressedAsset {
+export function compress (dict : Dictionary, asset : Asset) : CompressedAsset {
 	if (Array.isArray(asset)) {
-		return asset.map(el => compress(el))
+		return asset.map(el => compress(dict, el))
+	}
+
+	if (typeof asset === "string") {
+		return deflate(dict, asset)
 	}
 
 	if (typeof asset !== "object" || asset === null) {
@@ -49,23 +28,25 @@ export function compress (asset : Asset) : CompressedAsset {
 			? custom[asset.type].compress(asset)
 			: asset
 
-	const r = mapk(customized, dict.defl)
-	return mapv(r, dict.defl)
+	return mapkv(customized, x => deflate(dict, x))
 }
 
 // Deompress a single asset by renaming its keys and well-known values
 // using the predefined dictionary.
-export function decompress (compressed : mixed) : Asset {
+export function decompress (dict : Dictionary, compressed : mixed) : Asset {
 	if (Array.isArray(compressed)) {
-		return compressed.map(el => decompress(el))
+		return compressed.map(el => decompress(dict, el))
+	}
+
+	if (typeof compressed === "string") {
+		return inflate(dict, compressed)
 	}
 
 	if (typeof compressed !== "object" || compressed === null) {
 		return compressed
 	}
 
-	const r = mapk(compressed, dict.infl)
-	const inflated = mapv(r, dict.infl)
+	const inflated = mapkv(compressed, x => inflate(dict, x))
 
 	return (
 		typeof inflated === "object" && inflated.type in custom

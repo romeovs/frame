@@ -3,7 +3,7 @@ import DOM from "react-dom"
 import { HeadProvider } from "react-head"
 
 import { decompress } from "../compress"
-import { mapv } from "../map"
+import { mapkv } from "../map"
 import { context } from "./shared"
 
 export { useFrame } from "./shared"
@@ -11,6 +11,7 @@ export { useFrame } from "./shared"
 import { type Asset } from "../assets"
 export type { Asset }
 
+const dictionary = global.DICTIONARY || []
 
 export async function init (Component : React.AbstractComponent, dev : boolean) {
 	const {
@@ -18,8 +19,8 @@ export async function init (Component : React.AbstractComponent, dev : boolean) 
 		g: compressedGlobals,
 	} = await getlink("frameprops")
 
-	const props = mapv(compressedProps, v => decompress(v))
-	const globals = mapv(compressedGlobals, v => decompress(v))
+	const props = mapkv(compressedProps, v => decompress(dictionary, v))
+	const globals = mapkv(compressedGlobals, v => decompress(dictionary, v))
 	const comp = (
 		<context.Provider value={{ globals }}>
 			<HeadProvider>

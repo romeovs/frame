@@ -1,39 +1,20 @@
+// Dictionary is the dictionary to compress strings from
+export type Dictionary = string[]
+
+// Symbol is a compressed string
+type Symbol = string
+
+export const full = "abcdefghijkmnopqrstuvwxyzABCDEFGHIJKMNOPQRSTUVWXYZ"
 
 // The alphabet that will be used to translate keys
-const alphabet = "abcdefghijkmnopqrstuvwxyzABCDEFGHIJKMNOPQRSTUVWXYZ"
+const alphabet = Array.from(global.ALPHABET || full)
 
-export function dictionary (strings : string[]) : Dictionary {
-	if (strings.length > alphabet.length) {
-		throw new Error("Compression alphabet is too short")
-	}
+export function deflate (dict : Dictionary, string : string) : Symbol {
+	const index = dict.indexOf(string)
+	return index === -1 ? string : alphabet[index] || string
+}
 
-	const forwards = {}
-	const reverse = {}
-
-	for (const i in strings) {
-		const from = strings[i]
-		const to = alphabet[i]
-
-		if (from in forwards) {
-			throw new Error(`Duplicate key in dictionary: ${from}`)
-		}
-
-		forwards[from] = to
-		reverse[to] = from
-	}
-
-	return {
-		// The alphabet
-		alphabet: alphabet.substring(0, strings.length - 1),
-
-		// Deflate the string by looking up the compressed symbol in the dictionary
-		defl (str : string) : string {
-			return forwards[str] || str
-		},
-
-		// Inflate the compressed string by looking up the symbol in the dictionary
-		infl (sym : string) : string {
-			return reverse[sym] || sym
-		},
-	}
+export function inflate (dict : Dictionary, symbol : Symbol) : string {
+	const index = alphabet.indexOf(symbol)
+	return index === -1 ? symbol : dict[index] || symbol
 }

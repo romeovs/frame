@@ -10,6 +10,7 @@ import { Timer } from "./timer"
 import { babel } from "./babel"
 import { print, plugins } from "./shared"
 import { jspath } from "./constants"
+import { full } from "./compress/dictionary"
 
 import { type Compilation } from "./compilation"
 import { type Manifest } from "./manifest"
@@ -25,7 +26,7 @@ export async function client (ctx : Compilation, manifest : Manifest, entrypoint
 	ctx.log("Building client (modern=%s)", modern)
 
 	const js = entrypoints.map(e => e.entrypoint)
-	const cfg = config(ctx, modern, js)
+	const cfg = config(ctx, manifest, modern, js)
 
 	const bundle = await rollup(cfg)
 	const timings = bundle.getTimings()
@@ -64,7 +65,7 @@ const extensions = [
 	".json",
 ]
 
-function config (ctx : Compilation, modern : boolean, js : string[]) : mixed {
+function config (ctx : Compilation, manifest : Manifest, modern : boolean, js : string[]) : mixed {
 	return {
 		perf: true,
 		input: js,
@@ -97,6 +98,8 @@ function config (ctx : Compilation, modern : boolean, js : string[]) : mixed {
 			}),
 			replace({
 				"process.env.NODE_ENV": JSON.stringify(ctx.config.dev ? "development" : "production"),
+				"global.DICTIONARY": JSON.stringify(manifest.dictionary),
+				"global.ALPHABET": JSON.stringify(full.substring(0, manifest.dictionary.length)),
 			}),
 			babel(ctx, false, modern),
 			...plugins(ctx),

@@ -1,5 +1,6 @@
 import { compress, decompress } from "../compress"
 import { impath } from "../constants"
+import { dictionary } from "../defaults"
 
 const image = {
 	type: "image",
@@ -37,8 +38,8 @@ const examples = [
 
 test("compression should not be lossy", function () {
 	for (const example of examples) {
-		const c = compress(example)
-		const d = decompress(c)
+		const c = compress(dictionary, example)
+		const d = decompress(dictionary, c)
 		expect(d).toEqual(example)
 	}
 })
@@ -46,7 +47,7 @@ test("compression should not be lossy", function () {
 test("compression should reduce the overall size", function () {
 	for (const example of examples) {
 		const original = JSON.stringify(example)?.length || 0
-		const compressed = JSON.stringify(compress(example))?.length || 0
+		const compressed = JSON.stringify(compress(dictionary, example))?.length || 0
 		expect(compressed).toBeLessThanOrEqual(original)
 	}
 })

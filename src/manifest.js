@@ -6,6 +6,7 @@ import { load } from "./config"
 import { hash } from "./hash"
 import { asset } from "./assets"
 import { jspath } from "./constants"
+import * as defaults from "./defaults"
 
 
 type RouteDef = {
@@ -46,6 +47,9 @@ export type Manifest = {
 	globals : {
 		[string] : mixed,
 	},
+
+	// The dictionary used for compressing
+	dictionary : string[],
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {
@@ -86,6 +90,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	const m : Manifest = {
 		root: pth,
 		...cfg,
+		dictionary: cfg.dictionary || defaults.dictionary,
 		globals,
 		routes,
 		assets: Array.from(assets),
