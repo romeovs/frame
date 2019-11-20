@@ -25,3 +25,15 @@ export function mapv (dict : Dict, fn : (mixed, string, Dict) => mixed) : Dict {
 
 	return res
 }
+
+// Map both the keys and the values of an Object with the same fn.
+// The function takes arguments fn(key or value, dict).
+export function mapkv (dict : Dict, fn : mixed => mixed) : Dict {
+	const res = {}
+	for (const key in dict) {
+		const value = dict[key]
+		res[fn(key, dict)] = fn(value, dict)
+	}
+
+	return res
+}
