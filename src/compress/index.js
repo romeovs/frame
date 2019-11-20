@@ -1,5 +1,6 @@
 import { mapk, mapv } from "../map"
 import { impath } from "../constants"
+import { dictionary } from "./dictionary"
 
 type CompressedAsset = mixed
 
@@ -26,36 +27,8 @@ const strings = [
 	"json",
 ]
 
-const alphabet = "abcdefghijkmnopqrstuvwxyz"
 
-// Build compression dictionary dynamically
-const dictionary = {}
-const reverse = {}
-
-if (strings.length > alphabet.length) {
-	throw new Error("Compression alphabet is too short")
-}
-
-for (const i in strings) {
-	const from = strings[i]
-	const to = alphabet[i]
-
-	if (dictionary[from]) {
-		throw new Error(`Duplicate key in dictionary: ${from}`)
-	}
-
-	dictionary[from] = to
-	reverse[to] = from
-}
-
-function defl (key : string) : string {
-	return dictionary[key] || key
-}
-
-// Rename keys to original names
-function infl (key : string) : string {
-	return reverse[key] || key
-}
+const dict = dictionary(strings)
 
 // Compress a single asset by renaming its keys and well-known values
 // using a predefined dictionary.
@@ -78,8 +51,8 @@ export function compress (asset : Asset) : CompressedAsset {
 		}
 	}
 
-	const r = mapk(a, defl)
-	return mapv(r, defl)
+	const r = mapk(a, dict.defl)
+	return mapv(r, dict.defl)
 }
 
 // Deompress a single asset by renaming its keys and well-known values
@@ -93,8 +66,8 @@ export function decompress (asset : CompressedAsset) : Asset {
 		return asset
 	}
 
-	const r = mapk(asset, infl)
-	let a = mapv(r, infl)
+	const r = mapk(asset, dict.infl)
+	let a = mapv(r, dict.infl)
 
 	if (typeof a === "object" && "type" in a && a.type === "image") {
 		a = {
