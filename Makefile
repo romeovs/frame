@@ -15,6 +15,7 @@ SRC_FILES = $(shell find src -name "*.js")
 EXM_FILES = $(shell find example -type f  | grep -v example/dist | grep -v example/.frame_cache)
 ES_DIST = $(patsubst src/%.js,dist/es/%.js,$(SRC_FILES))
 
+.PHONY: list
 list:
 	@$m "Listing deps..."
 	@echo "cli src:"
@@ -33,6 +34,7 @@ dist/es/%.js: src/%.js
 	@$m "Building $<..."
 	@$(BABEL) $< -o $@
 
+.PHONY: lint
 lint:
 	@$m "Linting..."
 	@$(ESLINT) --ext .js --ext .jsx --ext .ts --ext .tsx src
@@ -53,5 +55,6 @@ example.serve:
 example.watch:
 	@./dist/cli.js watch -r example -v debug
 
+.PHONY: example.clean
 example.clean:
 	@rm -r example/dist/js
