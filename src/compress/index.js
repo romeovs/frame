@@ -1,5 +1,5 @@
-import { mapk, mapv } from "./map"
-import { impath } from "./constants"
+import { mapk, mapv } from "../map"
+import { impath } from "../constants"
 
 type CompressedAsset = mixed
 

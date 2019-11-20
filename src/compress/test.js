@@ -1,5 +1,5 @@
-import { compress, decompress } from "./compress"
-import { impath } from "./constants"
+import { compress, decompress } from "../compress"
+import { impath } from "../constants"
 
 const image = {
 	type: "image",
