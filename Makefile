@@ -4,6 +4,7 @@ BIN = ./node_modules/.bin
 ROLLUP = $(BIN)/rollup
 ESLINT = $(BIN)/eslint
 BABEL = $(BIN)/babel
+JEST = $(BIN)/jest
 
 # Logging helpers
 log_color = \033[34m
@@ -38,6 +39,11 @@ dist/es/%.js: src/%.js
 lint:
 	@$m "Linting..."
 	@$(ESLINT) --ext .js --ext .jsx --ext .ts --ext .tsx src
+
+.PHONY: test
+test:
+	@$m "Testing..."
+	@$(JEST)
 
 .PHONY: example
 example: $(EXM_FILES) cli
