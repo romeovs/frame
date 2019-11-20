@@ -14,13 +14,7 @@ const pkg = require("./package.json")
 const deps = Object.keys(pkg.dependencies || {})
 const peers = Object.keys(pkg.peerDependencies || {})
 
-export default {
-	input: path.resolve("src/cli/index.js"),
-	output: {
-		file: path.resolve("dist/cli.js"),
-		format: "cjs",
-		sourcemap: true,
-	},
+const base = {
 	treeshake: false,
 	external: [ ...deps, ...peers, "react-dom/server" ],
 	plugins: [
@@ -59,3 +53,33 @@ export default {
 		hashbang(),
 	],
 }
+
+export default [
+	{
+		...base,
+		input: path.resolve("src/cli/index.js"),
+		output: {
+			file: path.resolve("dist/cli.js"),
+			format: "cjs",
+			sourcemap: true,
+		},
+	},
+	{
+		...base,
+		input: path.resolve("src/lib/client.js"),
+		output: {
+			file: path.resolve("dist/lib/client.js"),
+			format: "esm",
+			sourcemap: true,
+		},
+	},
+	{
+		...base,
+		input: path.resolve("src/lib/server.js"),
+		output: {
+			file: path.resolve("dist/lib/server.js"),
+			format: "esm",
+			sourcemap: true,
+		},
+	},
+]

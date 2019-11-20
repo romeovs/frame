@@ -44,11 +44,11 @@ export function config (ctx : Compilation, server : boolean, modern : boolean) {
 				{
 					extensions,
 					alias: {
-						"frame/server": path.resolve(__dirname, "es/lib/server"),
+						"frame/server": path.resolve(__dirname, "lib/server"),
 						"frame":
 							server
-								? path.resolve(__dirname, "es/lib/server")
-								: path.resolve(__dirname, "es/lib/client"),
+								? path.resolve(__dirname, "lib/server")
+								: path.resolve(__dirname, "lib/client"),
 					},
 				},
 			],

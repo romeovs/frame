@@ -3,7 +3,6 @@ BIN = ./node_modules/.bin
 
 ROLLUP = $(BIN)/rollup
 ESLINT = $(BIN)/eslint
-BABEL = $(BIN)/babel
 JEST = $(BIN)/jest
 
 # Logging helpers
@@ -14,7 +13,6 @@ m = printf "$(log_color)$(log_name)$(log_no_color) %s$(log_no_color)\n"
 
 SRC_FILES = $(shell find src -name "*.js")
 EXM_FILES = $(shell find example -type f  | grep -v example/dist | grep -v example/.frame_cache)
-ES_DIST = $(patsubst src/%.js,dist/es/%.js,$(SRC_FILES))
 
 .PHONY: list
 list:
@@ -25,15 +23,19 @@ list:
 	@echo $(EXM_FILES) | xargs -n1 -- echo "  "
 
 cli: dist/cli.js
-es: $(ES_DIST)
 
-dist/cli.js: $(ES_DIST) $(SRC_FILES) rollup.config.js
+dist/cli.js: $(SRC_FILES) rollup.config.js
 	@$m "Building cli..."
 	@$(ROLLUP) -c
 
-dist/es/%.js: src/%.js
-	@$m "Building $<..."
-	@$(BABEL) $< -o $@
+dist/lib/client.js: $(SRC_FILES) rollup.config.js
+	@$m "Building cli..."
+	@$(ROLLUP) -c
+
+dist/lib/server.js: $(SRC_FILES) rollup.config.js
+	@$m "Building cli..."
+	@$(ROLLUP) -c
+
 
 .PHONY: lint
 lint:
