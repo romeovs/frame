@@ -1,5 +1,4 @@
 import * as React from "react"
-import path from "path"
 import { HeadProvider } from "react-head"
 
 import { type RouteDef } from "../manifest"
