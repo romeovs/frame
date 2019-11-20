@@ -8,6 +8,7 @@ import { context } from "./lib/shared"
 import { compress } from "./compress"
 import { mapv } from "./map"
 import { jspath } from "./constants"
+import { props } from "./props"
 
 import { type Compilation } from "./compilation"
 import { type Manifest } from "./manifest"
@@ -57,10 +58,7 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 			? css.map(asset => asset.content).join(" ")
 			: purge(ctx, body, css)
 
-	const propsfile = await ctx.write(`/${jspath}/p.json`, JSON.stringify({
-		p: mapv(route.props, v => compress(v)),
-		g: mapv(manifest.globals, v => compress(v)),
-	}), true)
+	const propsfile = await props(ctx, manifest, route.props)
 
 	const markup = DOM.renderToStaticMarkup(
 		<HTML
