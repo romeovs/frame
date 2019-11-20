@@ -1,6 +1,6 @@
 import { mapk, mapv } from "../map"
-import { impath } from "../constants"
 import { dictionary } from "./dictionary"
+import * as image from "./image"
 
 type CompressedAsset = mixed
 
@@ -29,6 +29,9 @@ const strings = [
 
 
 const dict = dictionary(strings)
+const custom = {
+	image,
+}
 
 // Compress a single asset by renaming its keys and well-known values
 // using a predefined dictionary.
@@ -41,46 +44,32 @@ export function compress (asset : Asset) : CompressedAsset {
 		return asset
 	}
 
-	let a = asset
+	const customized =
+		typeof asset === "object" && asset.type in custom
+			? custom[asset.type].compress(asset)
+			: asset
 
-	if (typeof asset === "object" && "type" in asset && asset.type === "image") {
-		a = {
-			...a,
-			matrix: a.matrix.map(x => x.replace(`/${impath}/${a.id.substring(0, 5)}/`, "")),
-			formats: undefined,
-		}
-	}
-
-	const r = mapk(a, dict.defl)
+	const r = mapk(customized, dict.defl)
 	return mapv(r, dict.defl)
 }
 
 // Deompress a single asset by renaming its keys and well-known values
 // using the predefined dictionary.
-export function decompress (asset : CompressedAsset) : Asset {
-	if (Array.isArray(asset)) {
-		return asset.map(el => decompress(el))
+export function decompress (compressed : mixed) : Asset {
+	if (Array.isArray(compressed)) {
+		return compressed.map(el => decompress(el))
 	}
 
-	if (typeof asset !== "object" || asset === null) {
-		return asset
+	if (typeof compressed !== "object" || compressed === null) {
+		return compressed
 	}
 
-	const r = mapk(asset, dict.infl)
-	let a = mapv(r, dict.infl)
+	const r = mapk(compressed, dict.infl)
+	const inflated = mapv(r, dict.infl)
 
-	if (typeof a === "object" && "type" in a && a.type === "image") {
-		a = {
-			...a,
-			matrix: a.matrix.map(x => `/${impath}/${a.id.substring(0, 5)}/${x}`),
-			formats: Array.from(new Set(a.matrix.map(format))),
-		}
-	}
-
-	return a
-}
-
-function format (str : string) : string {
-	const parts = str.split(".")
-	return parts[parts.length - 1]
+	return (
+		typeof inflated === "object" && inflated.type in custom
+			? custom[inflated.type].decompress(inflated)
+			: inflated
+	)
 }
