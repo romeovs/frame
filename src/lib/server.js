@@ -32,9 +32,9 @@ export function combine (acc : {[string] : RouteDef }, next : {[string] : RouteD
 	}
 }
 
-export function init (Component) {
+export function init (Component : React.AbstractComponent) : [ React.AbstractComponent, React.Node[]] {
 	const head = []
-	const Comp = function (props) {
+	function Comp (props : mixed) : React.AbstractComponent {
 		return (
 			<context.Provider value={global._frame_context}>
 				<HeadProvider headTags={head}>

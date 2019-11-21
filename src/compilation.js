@@ -7,18 +7,17 @@ import { type Config } from "./config"
 import { ColorfulLogger, LeveledLogger, NoopLogger, SimpleLogger } from "./log"
 import { hash } from "./hash"
 import { cache } from "./cache"
-import { Timer } from "./timer"
 
 import { manifest } from "./manifest"
-import { client } from "./client"
 import { watch as watchClient } from "./watch"
-import { server } from "./server"
 import { entrypoints } from "./entrypoints"
 import { render } from "./render"
-import { system } from "./system"
 import { serve } from "./serve"
 import { gzip } from "./gzip"
 import { brotli } from "./brotli"
+import { type BuildAssets } from "./client"
+
+import { build } from "./build"
 
 export class Compilation {
 	constructor (config : Config, cli : boolean = false) {
@@ -98,7 +97,7 @@ export class Compilation {
 	}
 
 	// Write a file to the output folder
-	async _writeFile (filename : string, content : string | Buffer) {
+	async _writeFile (filename : string, content : string | Buffer) : Promise<string> {
 		const base = filename.replace(/\/\//g, "/").replace(/^\//, "")
 		const fn = path.resolve(this.outputdir, base)
 		const dir = path.dirname(fn)
@@ -129,34 +128,15 @@ export class Compilation {
 	}
 
 	async build () {
-		const ctx = this
-		const timer = new Timer()
-		const sys = system(ctx)
-
-		const m = await manifest(ctx)
-		const e = await entrypoints(ctx, m)
-
-		const [ modern, legacy, srv ] = await Promise.all([
-			client(ctx, m, e, true),
-			ctx.config.dev ? [] : client(ctx, m, e, false),
-			server(ctx, m, e),
-		])
-
-		await render(ctx, m, {
-			modern,
-			legacy,
-			server: srv,
-			system: await sys,
-		})
-
-		ctx.log("Done! (%s)", timer)
+		await build(this)
 	}
 
 	async watch () {
+		/* eslint-disable consistent-this */
 		const ctx = this
 
-		let m
-		let e
+		let m = null
+		let e = null
 
 		async function rebuild () {
 			m = await manifest(ctx)
@@ -170,7 +150,6 @@ export class Compilation {
 				...m.assets,
 			])
 		}
-
 
 		// TODO: find a way to refresh when props change
 
@@ -194,7 +173,7 @@ export class Compilation {
 		}
 
 		const c = watchClient(ctx, m, e, true)
-		c.on("build", async function (modern) {
+		c.on("build", async function (modern : BuildAssets) {
 			x.modern = modern
 			if (x.modern && x.server) {
 				ctx.log("Rendering routes")

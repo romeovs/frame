@@ -1,7 +1,14 @@
 import React from "react"
+import { type Globals } from "../config"
 
-export const context = React.createContext({})
+export type Context = {
+	globals : Globals,
+}
 
-export function useFrame () {
+export const context = React.createContext({
+	globals: {},
+})
+
+export function useFrame () : Context {
 	return React.useContext(context)
 }

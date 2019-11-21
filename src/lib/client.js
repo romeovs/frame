@@ -29,7 +29,8 @@ export async function init (Component : React.AbstractComponent, dev : boolean) 
 		</context.Provider>
 	)
 
-	if (process.env.NODE_ENV === "development") {
+	if (global.DEV === "development") {
+		/* eslint-disable no-console */
 		console.log("This page is rendered with Frame.js")
 		DOM.render(comp, document.getElementById("app"))
 	} else {
@@ -44,5 +45,5 @@ async function getlink (id : string) : {[string] : mixed } {
 	}
 
 	const resp = await fetch(url)
-	return await resp.json()
+	return resp.json()
 }

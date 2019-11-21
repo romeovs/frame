@@ -1,8 +1,8 @@
 import * as React from "react"
 
 export function HTML (props : HTMLProps) : React.Node {
-	/* elsint-disable react/forbid-dom-props */
-	const { body, modern, legacy, system, propsfile, css, cssfiles, globalsfile, head } = props
+	/* eslint-disable react/forbid-dom-props */
+	const { body, modern, legacy, system, propsfile, css, cssfiles, head } = props
 
 	return (
 		<html>
@@ -13,7 +13,6 @@ export function HTML (props : HTMLProps) : React.Node {
 				{head}
 				{css && <style>{css}</style>}
 				{propsfile && <link id="frameprops" href={propsfile} rel="prefetch" />}
-				{globalsfile && <link id="frameglobals" href={globalsfile} rel="prefetch" />}
 				<link rel="icon" href="data:," />
 			</head>
 			<body>

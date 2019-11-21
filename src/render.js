@@ -4,10 +4,6 @@ import DOM from "react-dom/server"
 import { HTML } from "./html"
 import { purge } from "./purge-css"
 import { minify } from "./min-html"
-import { context } from "./lib/shared"
-import { compress } from "./compress"
-import { mapv } from "./map"
-import { jspath } from "./constants"
 import { props } from "./props"
 
 import { type Compilation } from "./compilation"
@@ -44,10 +40,11 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 	let body = ""
 	let head = []
 	if (server) {
+		/* eslint-disable global-require */
 		const [ Component, head_ ] = require(server)
 		body = DOM.renderToString(<Component {...route.props} />)
-		head = head_.map((tag, i) => (
-			<React.Fragment key={i}>
+		head = head_.map(tag => (
+			<React.Fragment key={Math.random()}>
 				{tag}
 			</React.Fragment>
 		))

@@ -4,8 +4,8 @@ import { type ImageAsset } from "../assets/image"
 export function compress (image : ImageAsset) : mixed {
 	return {
 		...image,
-			matrix: image.matrix.map(x => x.replace(`/${impath}/${image.id.substring(0, 5)}/`, "")),
-			formats: undefined,
+		matrix: image.matrix.map(x => x.replace(`/${impath}/${image.id.substring(0, 5)}/`, "")),
+		formats: undefined,
 	}
 }
 

@@ -19,7 +19,7 @@ export function print (ctx : Compilation, pfx : string, timings : Timings) {
 	}
 }
 
-export function plugins (ctx : Compilation) {
+export function plugins (ctx : Compilation) : mixed {
 	return [
 		postcss({
 			modules: {
@@ -49,8 +49,14 @@ export function plugins (ctx : Compilation) {
 	]
 }
 
+interface Closer {
+	close () : void,
+}
+
 export class WrapWatcher extends EventEmitter {
-	constructor (closer) {
+	_closer : Closer
+
+	constructor (closer : Closer) {
 		super()
 		this._closer = closer
 	}

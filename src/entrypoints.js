@@ -26,8 +26,7 @@ export async function entrypoints (ctx : Compilation, manifest : Manifest) : Ent
 		promises.push(entrypoint(ctx, component))
 	}
 
-	return await Promise.all(promises)
-
+	const res = await Promise.all(promises)
 	ctx.log("Built entrypoints (%s)", timer)
 
 	return res
@@ -54,7 +53,7 @@ export default init(Component)
 	const gen = generate(ast)
 	const id = hash(fname)
 
-	const entrypoint = await ctx.writeCache(`client/${id}.js`, gen.code)
+	const ep = await ctx.writeCache(`client/${id}.js`, gen.code)
 	if (gen.map) {
 		await ctx.writeCache(`client/${id}.js.map`, gen.map)
 	}
@@ -63,6 +62,6 @@ export default init(Component)
 		id,
 		component,
 		path: fname,
-		entrypoint,
+		entrypoint: ep,
 	}
 }

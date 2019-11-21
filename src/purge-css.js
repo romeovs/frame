@@ -22,5 +22,5 @@ export function purge (ctx : Compilation, markup : string, css : CSS[]) : string
 }
 
 function clean (content : string) : stirng {
-	return content.replace(/\/\*#[^\/]+\*\//g, "")
+	return content.replace(/\/\*#[^/]+\*\//g, "")
 }

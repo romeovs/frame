@@ -4,7 +4,40 @@ import { rollup } from "rollup"
 
 import { babel } from "./babel"
 
-export async function load (ctx : Compilation, filename : string) {
+export type ImageFormat = "jpeg" | "webp" | "png" | "tiff" | "gif"
+export type ImageConfig = {
+	gip : boolean,
+	sizes : number[],
+	formats : {
+		[ImageFormat | "*"] : ImageFormat[],
+	},
+}
+
+export type RouteDef = {
+	url : string,
+	component : string,
+	props : {[string] : mixed },
+}
+
+export type Globals = {
+	[string] : mixed,
+}
+
+export type FrameDefinition = {
+	// The image config, read from the asset file
+	images? : ImageConfig,
+
+	// The routes of the site, with their respective props
+	routes : () => Promise<RouteDef[]>,
+
+	// Globals shared between js and css
+	globals? : () => Promise<Globals>,
+
+	// The dictionary used for compressing
+	dictionary? : string[],
+}
+
+export async function load (ctx : Compilation, filename : string) : FrameDefinition {
 	const warnings = []
 	const bundle = await rollup({
 		input: filename,
@@ -32,6 +65,7 @@ export async function load (ctx : Compilation, filename : string) {
 	}
 
 	delete require.cache[filename]
+	/* eslint-disable global-require */
 	const cfg = require(filename).default
 	require.extensions[".js"] = jsloader
 

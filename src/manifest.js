@@ -2,28 +2,10 @@ import path from "path"
 import glob from "glob"
 
 import { type Compilation } from "./compilation"
-import { load } from "./config"
+import { load, type RouteDef, type ImageConfig } from "./config"
 import { hash } from "./hash"
 import { asset } from "./assets"
-import { jspath } from "./constants"
 import * as defaults from "./defaults"
-
-
-type RouteDef = {
-	url : string,
-	component : string,
-	props : {[string] : mixed },
-}
-
-type ImageFormat = "jpeg" | "webp" | "png" | "tiff" | "gif"
-
-type ImageConfig = {
-	gip : boolean,
-	sizes : number[],
-	formats : {
-		[ImageFormat | "*"] : ImageFormat[],
-	},
-}
 
 export type Manifest = {
 	// The root frame file the manifest was built from
@@ -58,7 +40,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	const cfg = await load(ctx, pth)
 
 	const assets = new Set()
-	global._frame_asset = function (fname : string) {
+	global._frame_asset = function (fname : string) : Asset {
 		const filename = path.resolve(ctx.config.root, fname)
 		assets.add(filename)
 		return asset(ctx, cfg, filename)
@@ -101,7 +83,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	return m
 }
 
-function run (fn) {
+function run<T> (fn : () => T) : T {
 	if (typeof fn === "function") {
 		return fn()
 	}

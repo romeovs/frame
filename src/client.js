@@ -16,12 +16,23 @@ import { type Compilation } from "./compilation"
 import { type Manifest } from "./manifest"
 import { type Entrypoints } from "./entrypoints"
 
-type JSMap = {
+export type CSSAsset = {
+	type : "css",
+	id : string,
+	src : string,
+	content : string,
+}
+
+export type JSAsset = {
+	type : "js",
 	id : string,
 	src : string,
 }
 
-export async function client (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints, modern : boolean) : Promise<JSMap> {
+export type BuildAsset = CSSAsset | JSAsset
+export type BuildAssets = BuildAsset[]
+
+export async function client (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints, modern : boolean) : Promise<BuildAssets> {
 	const timer = new Timer()
 	ctx.log("Building client (modern=%s)", modern)
 
@@ -39,11 +50,11 @@ export async function client (ctx : Compilation, manifest : Manifest, entrypoint
 	return marshal(ctx, output)
 }
 
-function marshal (ctx, output) {
+function marshal (ctx : Comilation, output : mixed) : BuildAsset {
 	return (
 		output
 			.filter(asset => asset.isEntry || asset.fileName.endsWith(".css"))
-			.map(function (asset : mixed) : JSMap {
+			.map(function (asset : mixed) : BuildAsset {
 				if (asset.fileName.endsWith(".css")) {
 					return {
 						src: `/${jspath}/${asset.fileName}`,
@@ -90,6 +101,7 @@ function config (ctx : Compilation, manifest : Manifest, modern : boolean, js : 
 					"node_modules/**",
 				],
 				namedExports: {
+					/* eslint-disable global-require */
 					"node_modules/react/index.js": Object.keys(require("react")),
 					"node_modules/react-dom/index.js": Object.keys(require("react-dom")),
 					"node_modules/react-head/dist/index.esm.js": Object.keys(require("react-head")),
@@ -98,6 +110,7 @@ function config (ctx : Compilation, manifest : Manifest, modern : boolean, js : 
 			}),
 			replace({
 				"process.env.NODE_ENV": JSON.stringify(ctx.config.dev ? "development" : "production"),
+				"global.DEV": JSON.stringify(ctx.config.dev),
 				"global.DICTIONARY": JSON.stringify(manifest.dictionary),
 				"global.ALPHABET": JSON.stringify(full.substring(0, manifest.dictionary.length)),
 			}),

@@ -12,10 +12,10 @@ export function babel (ctx : Comilation, server : boolean, modern : boolean) : b
 	})
 }
 
-export function config (ctx : Compilation, server : boolean, modern : boolean) {
+export function config (ctx : Compilation, server : boolean, modern : boolean) : mixed {
 	const targets =
 		server
-	 		? { node: true }
+			? { node: true }
 			: modern
 				? { esmodules: true }
 				: ctx.config.browsers

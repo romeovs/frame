@@ -75,6 +75,7 @@ async function immatrix (ctx : Compilation, manifest : Manifest, metadata : Meta
 	return { matrix, formats }
 }
 
+/* eslint-disable max-params */
 async function imsrc (ctx : Compilation, manifest : Manifest, meta : Metadata, filename : string, format : string, size : number) : Promise<string> {
 	const timer = new Timer()
 	const img = sharp(filename)

@@ -1,6 +1,6 @@
 import path from "path"
 
-import webpack from "webpack"
+import webpack, { type WebpackError, type Stats, type WebpackOptions } from "webpack"
 import express from "express"
 import hot from "webpack-hot-middleware"
 
@@ -8,9 +8,16 @@ import { cerror } from "./log/capture"
 import { jspath } from "./constants"
 import { config as babel } from "./babel"
 import { WrapWatcher } from "./shared"
+import { type JSAsset } from "./client"
+import { type Manifest } from "./manifest"
 import * as pcss from "./postcss"
 
-export function watch (ctx : Compilation, manifest : manifest, entrypoints : Entrypoints) {
+interface Emitter {
+	on ("build", JSAsset => void) : void,
+	close () : void,
+}
+
+export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints) : Emitter {
 	ctx.log("Watching client")
 
 	const cfg = config(ctx, entrypoints)
@@ -32,7 +39,7 @@ export function watch (ctx : Compilation, manifest : manifest, entrypoints : Ent
 	w.watch({
 		aggregateTimeout: 300,
 		poll: undefined,
-	}, function (err, stats) {
+	}, function (err : WebpackError, stats : Stats) {
 		if (err) {
 			cerror(err)
 			return
@@ -41,7 +48,7 @@ export function watch (ctx : Compilation, manifest : manifest, entrypoints : Ent
 		const json = stats.toJson()
 		ctx.log("Client built (%sms)", json.time)
 		const assets = json.assetsByChunkName
-		const r = entrypoints.map(function (entry) {
+		const r = entrypoints.map(function (entry : mixed) : JSAsset {
 			const p = assets[entry.id].find(a => a.endsWith(".js"))
 			return {
 				type: "js",
@@ -56,7 +63,7 @@ export function watch (ctx : Compilation, manifest : manifest, entrypoints : Ent
 	return evts
 }
 
-function config (ctx : Compilation, entrypoints : Entrypoints) {
+function config (ctx : Compilation, entrypoints : Entrypoints) : WebpackOptions {
 	const f = Array.from(new Set(entrypoints.map(e => e.entrypoint)))
 	const entries = {}
 	for (const e of f) {
