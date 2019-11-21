@@ -16,21 +16,30 @@ import { type Compilation } from "./compilation"
 import { type Manifest } from "./manifest"
 import { type Entrypoints } from "./entrypoints"
 
-export type CSSAsset = {
+export type Stylesheet = {
 	type : "css",
-	id : string,
 	src : string,
 	content : string,
 }
 
-export type JSAsset = {
+export type Script = {
 	type : "js",
 	id : string,
 	src : string,
 }
 
-export type BuildAsset = CSSAsset | JSAsset
+export type BuildAsset = Stylesheet | Script
 export type BuildAssets = BuildAsset[]
+
+type RollupChunk = {
+	isAsset : boolean,
+	isEntry : boolean,
+	fileName : string,
+	source : string,
+	code : string,
+	map : string,
+	facadeModuleId : string,
+}
 
 export async function client (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints, modern : boolean) : Promise<BuildAssets> {
 	const timer = new Timer()
@@ -43,6 +52,7 @@ export async function client (ctx : Compilation, manifest : Manifest, entrypoint
 	const timings = bundle.getTimings()
 	print(ctx, "Client bundle", timings)
 
+	// $ExpectError: Flow does not know rollup
 	const { output } = await bundle.generate(cfg.output)
 	await write(ctx, output)
 	ctx.log("Client built (modern=%s) (%s)", modern, timer)
@@ -50,11 +60,11 @@ export async function client (ctx : Compilation, manifest : Manifest, entrypoint
 	return marshal(ctx, output)
 }
 
-function marshal (ctx : Comilation, output : mixed) : BuildAsset {
+function marshal (ctx : Compilation, output : RollupChunk[]) : BuildAssets {
 	return (
 		output
 			.filter(asset => asset.isEntry || asset.fileName.endsWith(".css"))
-			.map(function (asset : mixed) : BuildAsset {
+			.map(function (asset : RollupChunk) : BuildAsset {
 				if (asset.fileName.endsWith(".css")) {
 					return {
 						src: `/${jspath}/${asset.fileName}`,
@@ -122,7 +132,7 @@ function config (ctx : Compilation, manifest : Manifest, modern : boolean, js : 
 }
 
 // Write the bundle to disk
-async function write (ctx : Compilation, output : mixed) {
+async function write (ctx : Compilation, output : RollupChunk[]) {
 	const promises = []
 
 	for (const chunk of output) {

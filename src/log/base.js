@@ -1,3 +1,5 @@
+import { type Level } from "./level"
+
 // The base class for loggers
 export class Logger {
 	// Implement this method in all Loggers.

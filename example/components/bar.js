@@ -1,10 +1,14 @@
-import React from "react"
+import * as React from "react"
 import styles from "./bar.css"
 
-export default function Bar (props) : React.Node {
+export type BarProps = {
+	title : string,
+}
+
+export default function Bar (props : BarProps) : React.Node {
 	return (
 		<div className={styles.bar}>
-			Bar dopek
+			Bar: {props.title}
 		</div>
 	)
 }

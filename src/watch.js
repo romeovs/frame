@@ -8,12 +8,15 @@ import { cerror } from "./log/capture"
 import { jspath } from "./constants"
 import { config as babel } from "./babel"
 import { WrapWatcher } from "./shared"
-import { type JSAsset } from "./client"
+import { type Compilation } from "./compilation"
+import { type BuildAssets } from "./client"
 import { type Manifest } from "./manifest"
+import { type Entrypoints } from "./entrypoints"
+import { type Script } from "./client"
 import * as pcss from "./postcss"
 
 interface Emitter {
-	on ("build", JSAsset => void) : void,
+	on ("build", (BuildAssets => void) | (BuildAssets => Promise<void>)) : void,
 	close () : void,
 }
 
@@ -22,13 +25,15 @@ export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Ent
 
 	const cfg = config(ctx, entrypoints)
 	const w = webpack(cfg)
-	const evts = new WrapWatcher()
+
+	// $ExpectError: TODO, can we coerce here?
+	const evts = new WrapWatcher(w)
 
 	// Set up express server
 	const app = express()
 	app.use(hot(w, {
 		noInfo: true,
-		publicPath: cfg.output.publicPath,
+		publicPath: cfg.output?.publicPath,
 	}))
 	app.use(express.static(ctx.outputdir))
 	app.listen(ctx.config.port || 8080)
@@ -48,11 +53,13 @@ export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Ent
 		const json = stats.toJson()
 		ctx.log("Client built (%sms)", json.time)
 		const assets = json.assetsByChunkName
-		const r = entrypoints.map(function (entry : mixed) : JSAsset {
-			const p = assets[entry.id].find(a => a.endsWith(".js"))
+		const r = entrypoints.map(function (entry : mixed) : Script {
+			// $ExpectError: Flow does not know webpack assets
+			const { id } = entry
+			const p = assets[id].find(a => a.endsWith(".js"))
 			return {
+				id,
 				type: "js",
-				id: entry.id,
 				src: `/${jspath}/${p}`,
 			}
 		})
@@ -60,6 +67,7 @@ export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Ent
 		evts.emit("build", r)
 	})
 
+	// $ExpectError: TODO, can we coerce here?
 	return evts
 }
 

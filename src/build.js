@@ -6,6 +6,7 @@ import { server } from "./server"
 import { entrypoints } from "./entrypoints"
 import { render } from "./render"
 import { system } from "./system"
+import { type Compilation } from "./compilation"
 
 export async function build (ctx : Compilation) {
 	const timer = new Timer()

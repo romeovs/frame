@@ -1,6 +1,7 @@
 import zopfli from "node-zopfli"
 
 import { Timer } from "./timer"
+import { type Compilation } from "./compilation"
 
 const exts = [
 	".js",
@@ -12,7 +13,7 @@ const exts = [
 ]
 
 // Gzip the contents and write to filename
-export async function gzip (ctx : Compilation, filename : string, content : string) {
+export async function gzip (ctx : Compilation, filename : string, content : string | Buffer) {
 	const timer = new Timer()
 	if (ctx.config.dev || !gzippable(filename)) {
 		return
@@ -27,8 +28,8 @@ export async function gzip (ctx : Compilation, filename : string, content : stri
 		return
 	}
 
-	await ctx._writeFile(`${filename}.gz`, gzipped)
-	ctx.debug("Gzipped %s (%s)", filename, timer)
+	const f = await ctx._writeFile(`${filename}.gz`, gzipped)
+	ctx.debug("Gzipped %s (%s)", f, timer)
 }
 
 function gzippable (filename : string) : boolean {

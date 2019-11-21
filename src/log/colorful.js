@@ -1,10 +1,12 @@
-import process from "process"
+import { type Writable } from "stream"
+
 import printf from "printf"
 
 import { Timer } from "../timer"
 
 import { esc, color } from "./color"
 import { Logger } from "./base"
+import { type Level } from "./level"
 
 const name = "frame"
 
@@ -12,6 +14,9 @@ const interpolateColor = 136
 const debugColor = 58
 
 export class ColorfulLogger extends Logger {
+	_out : Writable
+	_timer : Timer
+
 	constructor (out : Writable = process.stdout) {
 		super()
 		this._timer = new Timer()

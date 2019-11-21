@@ -1,5 +1,7 @@
 import minifier from "html-minifier"
 
+import { type Compilation } from "./compilation"
+
 export function minify (ctx : Compilation, markup : string) : string {
 	return minifier.minify(markup, {
 		collapseBooleanAttributes: true,

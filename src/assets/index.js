@@ -1,10 +1,9 @@
 import path from "path"
 
 import { type Compilation } from "../compilation"
-import { type Manifest } from "../manifest"
+import { type FrameDefinition } from "../config"
 
 import { Timer } from "../timer"
-import { hash } from "../hash"
 
 import { image, type ImageAsset } from "./image"
 import { json, type JSONAsset } from "./json"
@@ -14,11 +13,10 @@ import { markdown, type MarkdownAsset } from "./markdown"
 export type Asset = ImageAsset | JSONAsset | YAMLAsset | MarkdownAsset
 
 // The type of asset handler functions
-type Handler = (ctx : Compilation, filename : string) => Promise<?Asset>
-type Handlers = {[string] : Handler }
+type Handler = (ctx : Compilation, defn : FrameDefinition, filename : string) => Promise<?Asset>
 
 // Asset handlers by extension
-const handlers : Handlers = {
+const handlers = {
 	png: image,
 	jpg: image,
 	jpeg: image,
@@ -28,7 +26,7 @@ const handlers : Handlers = {
 	md: markdown,
 }
 
-export async function asset (ctx : Compilation, manifest : Manifest, filename : string) : Promise<?Asset> {
+export async function asset (ctx : Compilation, dfn : FrameDefinition, filename : string) : Promise<?Asset> {
 	const timer = new Timer()
 	const ext = path.extname(filename).slice(1)
 
@@ -39,15 +37,13 @@ export async function asset (ctx : Compilation, manifest : Manifest, filename : 
 		return null
 	}
 
-	const r = await handler(ctx, manifest, filename)
+	// $ExpectError: Cannot spread after
+	const r = await handler(ctx, dfn, filename)
 	if (!r) {
 		return null
 	}
 
 	ctx.log("Processed %s (%s)", filename, timer)
 
-	return {
-		...r,
-		id: hash(filename),
-	}
+	return r
 }

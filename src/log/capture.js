@@ -13,10 +13,12 @@ export const cerror = console.error
 
 // Capture all console.log messages and print them in a different color.
 export function capture () {
+	// $ExpectError: Flow thinks overwriting console.log is impossible
 	console.log = function (...args : mixed[]) {
 		clog(esc(unkownColor, util.format(...args)))
 	}
 
+	// $ExpectError: Flow thinks overwriting console.error is impossible
 	console.error = function (...args : mixed[]) {
 		cerror(esc(unkownColor, util.format(...args)))
 	}
@@ -25,6 +27,9 @@ export function capture () {
 // Release the console logging capture and reinstall
 // the default console methods.
 export function release () {
+	// $ExpectError: Flow thinks overwriting console.log is impossible
 	console.log = clog
+
+	// $ExpectError: Flow thinks overwriting console.error is impossible
 	console.error = cerror
 }

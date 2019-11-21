@@ -8,14 +8,14 @@ import { Timer } from "../timer"
 import { impath } from "../constants"
 
 import { type Compilation } from "../compilation"
-import { type Manifest } from "../manifest"
+import { type FrameDefinition, type ImageFormat } from "../config"
 
 export type ImageAsset = {
 	type : "image",
 	id : string,
 	width : number,
 	height : number,
-	formats : string[],
+	formats : ImageFormat[],
 	matrix : string[],
 	color : ?string,
 	gradient : ?string[],
@@ -23,12 +23,14 @@ export type ImageAsset = {
 
 type Metadata = {
 	width : number,
+	format : ImageFormat,
 }
 
-export async function image (ctx : Compilation, manifest : Manifest, filename : string) : Promise<ImageAsset> {
+export async function image (ctx : Compilation, manifest : FrameDefinition, filename : string) : Promise<ImageAsset> {
 	const img = sharp(filename)
 	const metadata = await img.metadata()
 
+	// $ExpectError: Flow does not know about recursive
 	await fs.mkdir(path.resolve(ctx.config.output, impath), { recursive: true })
 
 	const [
@@ -36,7 +38,8 @@ export async function image (ctx : Compilation, manifest : Manifest, filename : 
 		css,
 	] = await Promise.all([
 		immatrix(ctx, manifest, metadata, filename),
-		manifest.images.gip ? ctx.cache([ filename, "gip" ], () => gip(filename)) : {},
+		// $ExpectError: TODO make cache generic
+		manifest.images?.gip ? ctx.cache([ filename, "gip" ], () => gip(filename)) : {},
 	])
 
 	return {
@@ -51,16 +54,16 @@ export async function image (ctx : Compilation, manifest : Manifest, filename : 
 	}
 }
 
-async function immatrix (ctx : Compilation, manifest : Manifest, metadata : Metadata, filename : string) : Promise<string[]> {
+async function immatrix (ctx : Compilation, manifest : FrameDefinition, metadata : Metadata, filename : string) : Promise<{ matrix : string[], formats : ImageFormat[]}> {
 	const promises = []
 
 	const formats =
-		manifest.images.formats[metadata.format]
-		|| manifest.images.formats["*"]
+		manifest.images?.formats[metadata.format]
+		|| manifest.images?.formats?.["*"]
 		|| [ metadata.format ]
 
 	// Truncate the sizes to the max width
-	const truncated = manifest.images.sizes
+	const truncated = (manifest.images?.sizes || [ Infinity ])
 		.map(size => size === Infinity ? metadata.width : size)
 		.filter(size => size <= metadata.width)
 
@@ -76,7 +79,7 @@ async function immatrix (ctx : Compilation, manifest : Manifest, metadata : Meta
 }
 
 /* eslint-disable max-params */
-async function imsrc (ctx : Compilation, manifest : Manifest, meta : Metadata, filename : string, format : string, size : number) : Promise<string> {
+async function imsrc (ctx : Compilation, manifest : FrameDefinition, meta : Metadata, filename : string, format : string, size : number) : Promise<string> {
 	const timer = new Timer()
 	const img = sharp(filename)
 	const width = Math.min(size, meta.width)
@@ -94,24 +97,15 @@ async function imsrc (ctx : Compilation, manifest : Manifest, meta : Metadata, f
 
 	if (format === "webp") {
 		img.webp({
-			quality:
-				manifest.images?.quality?.webp
-				|| manifest.images?.quality
-				|| 85,
-			alphaQuality:
-				manifest.images?.quality?.webp
-				|| manifest.images?.quality
-				|| 85,
+			quality: quality(manifest, "webp"),
+			alphaQuality: quality(manifest, "webp"),
 		})
 	}
 
 	if (format === "jpeg") {
 		img.jpeg({
 			progressive: true,
-			quality:
-				manifest.images?.quality?.jpeg
-				|| manifest.images?.quality
-				|| 85,
+			quality: quality(manifest, "jpeg"),
 		})
 	}
 
@@ -135,7 +129,7 @@ async function prefix (filename : string) : Promise<string> {
 
 // Check if an image with the specified prefix, size and format already exists in the
 // image directory (regardless of hash).
-async function exists (ctx : Compilation, pfx : string, size : number | string, format : string) : Promise<string> {
+async function exists (ctx : Compilation, pfx : string, size : number | string, format : string) : Promise<?string> {
 	if (ctx.config.force) {
 		ctx.debug("Not considering existing image %s because force is %s", `${pfx}.${size}`, ctx.config.force)
 		return null
@@ -149,4 +143,20 @@ async function exists (ctx : Compilation, pfx : string, size : number | string, 
 	}
 
 	return `/${impath}/${pfx}/${found}`
+}
+
+function quality (manifest : FrameDefinition, format : ImageFormat) : number {
+	if (!manifest.images || !manifest.images.quality) {
+		return 85
+	}
+
+	if (typeof manifest.images.quality === "number") {
+		return manifest.images.quality
+	}
+
+	if (format in manifest.images.quality) {
+		return manifest.images.quality[format]
+	}
+
+	return 85
 }

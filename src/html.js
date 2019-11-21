@@ -1,4 +1,16 @@
 import * as React from "react"
+import { type Script } from "./client"
+
+type HTMLProps = {
+	modern? : string,
+	legacy? : string,
+	system? : Script[],
+	css : string,
+	cssfiles : string[],
+	head : React.Node[],
+	body : string,
+	propsfile : string,
+}
 
 export function HTML (props : HTMLProps) : React.Node {
 	/* eslint-disable react/forbid-dom-props */
@@ -9,7 +21,7 @@ export function HTML (props : HTMLProps) : React.Node {
 			<head>
 				<meta charSet="utf-8" />
 				{modern && <script defer type="module" src={modern} />}
-				{legacy && system && <script defer noModule src={system} />}
+				{legacy && system && system.map(asset => <script defer noModule src={asset.src} key={asset.id} />)}
 				{head}
 				{css && <style>{css}</style>}
 				{propsfile && <link id="frameprops" href={propsfile} rel="prefetch" />}

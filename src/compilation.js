@@ -3,8 +3,7 @@ import printf from "printf"
 import chokidar from "chokidar"
 
 import fs from "./fs"
-import { type Config } from "./config"
-import { ColorfulLogger, LeveledLogger, NoopLogger, SimpleLogger } from "./log"
+import { ColorfulLogger, LeveledLogger, NoopLogger, SimpleLogger, type LogLevel, type Logger } from "./log"
 import { hash } from "./hash"
 import { cache } from "./cache"
 
@@ -19,9 +18,54 @@ import { type BuildAssets } from "./client"
 
 import { build } from "./build"
 
+export type InputConfig = {
+	root : string,
+	output? : string,
+	cache? : string,
+	dev? : boolean,
+	loglevel? : LogLevel,
+	colors? : boolean,
+	force? : boolean,
+	onWarning? : string => void,
+	port? : number,
+}
+
+export type Config = {
+	root : string,
+	output : string,
+	cache : string,
+	dev : boolean,
+	loglevel : LogLevel,
+	colors : boolean,
+	force : boolean,
+	onWarning : string => void,
+	port : number,
+}
+
+function normalize (cfg : InputConfig) : Config {
+	const noop = () => undefined
+
+	return {
+		root: cfg.root,
+		output: cfg.output || path.resolve(cfg.root, "dist"),
+		cache: cfg.cache || path.resolve(cfg.root, ".frame_cache"),
+		dev: Boolean(cfg.dev),
+		loglevel: cfg.loglevel || "info",
+		colors: cfg.colors !== false,
+		onWarning: cfg.onWarning || noop,
+		force: Boolean(cfg.force),
+		port: cfg.port || 8080,
+	}
+}
+
 export class Compilation {
-	constructor (config : Config, cli : boolean = false) {
-		this.config = config
+	config : Config
+	cli : boolean
+	logger : Logger
+
+	constructor (config : InputConfig, cli : boolean = false) {
+		this.config = normalize(config)
+		this.cli = cli
 
 		const logger = this.config.colors ? new ColorfulLogger() : new SimpleLogger()
 		this.logger =
@@ -53,7 +97,7 @@ export class Compilation {
 
 	// Log a fatal error message and stop building.
 	fatal (msg : string, ...args : mixed[]) {
-		if (this.config.cli) {
+		if (this.cli) {
 			/* eslint-disable no-process-exit */
 			this.error(msg, ...args)
 			process.exit(1)
@@ -104,6 +148,7 @@ export class Compilation {
 
 		this.log("Writing %s", `/${base}`)
 
+		// $ExpectError: Flow does not know about recursive
 		await fs.mkdir(dir, { recursive: true })
 		await fs.writeFile(fn, content)
 
@@ -116,6 +161,7 @@ export class Compilation {
 
 		this.debug("Writing cache %s", fname)
 
+		// $ExpectError: Flow does not know about recursive
 		await fs.mkdir(dir, { recursive: true })
 		await fs.writeFile(fname, content)
 
@@ -166,18 +212,24 @@ export class Compilation {
 
 		await rebuild()
 
-		const x = {
-			modern: null,
-			server: [],
-			legacy: [],
+		let modern : ?BuildAssets = null
+
+		if (!m || !e) {
+			throw Error("Could not start watching")
 		}
 
-		const c = watchClient(ctx, m, e, true)
-		c.on("build", async function (modern : BuildAssets) {
-			x.modern = modern
-			if (x.modern && x.server) {
+		const c = watchClient(ctx, m, e)
+		/* eslint-disable flowtype/require-return-type */
+		c.on("build", async function (a : BuildAssets) : Promise<void> {
+			modern = a
+			if (modern && m) {
 				ctx.log("Rendering routes")
-				await render(ctx, m, x)
+				await render(ctx, m, {
+					modern,
+					server: [],
+					legacy: [],
+					system: [],
+				})
 				ctx.log("Done!")
 			}
 		})

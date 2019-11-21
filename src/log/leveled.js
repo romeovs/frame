@@ -2,6 +2,9 @@ import { Logger } from "./base"
 import { is, type Level } from "./level"
 
 export class LeveledLogger extends Logger {
+	_level : Level
+	_logger : Logger
+
 	constructor (logger : Logger, level : Level) {
 		super()
 		this._level = level

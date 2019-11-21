@@ -1,15 +1,26 @@
 import { impath } from "../constants"
 import { type ImageAsset } from "../assets/image"
+import { type ImageFormat } from "../config"
 
-export function compress (image : ImageAsset) : mixed {
+type CompressedImage = {
+	type : "image",
+	id : string,
+	width : number,
+	height : number,
+	matrix : string[],
+	color : ?string,
+	gradient : ?string[],
+}
+
+export function compress (image : ImageAsset) : CompressedImage {
+	const { formats, ...rest } = image
 	return {
-		...image,
+		...rest,
 		matrix: image.matrix.map(x => x.replace(`/${impath}/${image.id.substring(0, 5)}/`, "")),
-		formats: undefined,
 	}
 }
 
-export function decompress (image : mixed) : ImageAsset {
+export function decompress (image : CompressedImage) : ImageAsset {
 	return {
 		...image,
 		matrix: image.matrix.map(x => `/${impath}/${image.id.substring(0, 5)}/${x}`),
@@ -17,7 +28,9 @@ export function decompress (image : mixed) : ImageAsset {
 	}
 }
 
-function format (str : string) : string {
+function format (str : string) : ImageFormat {
 	const parts = str.split(".")
+
+	// $ExpectError: We want to avoid this check here
 	return parts[parts.length - 1]
 }

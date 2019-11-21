@@ -11,7 +11,7 @@ export type JSONAsset = {
 }
 
 export async function json (ctx : Compilation, _ : Manifest, filename : string) : Promise<JSONAsset> {
-	const content = await fs.readFile(filename)
+	const content = await fs.readFile(filename, "utf-8")
 	return {
 		type: "json",
 		id: hash(filename),

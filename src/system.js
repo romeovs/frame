@@ -6,7 +6,7 @@ import fs from "./fs"
 import { jspath } from "./constants"
 import { Timer } from "./timer"
 import { type Compilation } from "./compilation"
-import { type Asset } from "./assets"
+import { type Script } from "./client"
 import { hash } from "./hash"
 
 const polyfills = [
@@ -16,7 +16,7 @@ const polyfills = [
 ]
 
 // Installs system js bundle
-export async function system (ctx : Compilation) : Promise<Asset> {
+export async function system (ctx : Compilation) : Promise<Script[]> {
 	const timer = new Timer()
 
 	const content = await Promise.all(
@@ -38,5 +38,9 @@ export async function system (ctx : Compilation) : Promise<Asset> {
 
 	ctx.log("Copied System.js polyfills (%s)", timer)
 
-	return src
+	return [{
+		type: "js",
+		id: "sys",
+		src,
+	}]
 }

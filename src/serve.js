@@ -1,6 +1,7 @@
 import express, { type $Request, type $Response, type NextFunction } from "express"
 
 import { Timer } from "./timer"
+import { type Compilation } from "./compilation"
 
 export function serve (ctx : Compilation) {
 	const port = ctx.config.port || 8080

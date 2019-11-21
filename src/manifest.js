@@ -2,10 +2,15 @@ import path from "path"
 import glob from "glob"
 
 import { type Compilation } from "./compilation"
-import { load, type RouteDef, type ImageConfig } from "./config"
+import { load, type RouteDef as _RouteDef, type ImageConfig, type FrameDefinition, type Globals } from "./config"
 import { hash } from "./hash"
-import { asset } from "./assets"
+import { asset, type Asset } from "./assets"
 import * as defaults from "./defaults"
+
+export type RouteDef = {
+	..._RouteDef,
+	id : string,
+}
 
 export type Manifest = {
 	// The root frame file the manifest was built from
@@ -15,9 +20,7 @@ export type Manifest = {
 	images : ImageConfig,
 
 	// The routes of the site, with their respective props
-	routes : {
-		[string] : RouteDef,
-	},
+	routes : RouteDef[],
 
 	// All assets that were loaded in the manifest file
 	assets : string[],
@@ -26,21 +29,22 @@ export type Manifest = {
 	globs : string[],
 
 	// Globals shared between js and css
-	globals : {
-		[string] : mixed,
-	},
+	globals : Globals,
 
 	// The dictionary used for compressing
 	dictionary : string[],
+
+	// The browsers to build for
+	browsers : string[],
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {
 	ctx.log("Collecting assets and routes")
 	const pth = path.resolve(ctx.config.root, "frame.js")
-	const cfg = await load(ctx, pth)
+	const cfg : FrameDefinition = await load(ctx, pth)
 
 	const assets = new Set()
-	global._frame_asset = function (fname : string) : Asset {
+	global._frame_asset = function (fname : string) : Promise<?Asset> {
 		const filename = path.resolve(ctx.config.root, fname)
 		assets.add(filename)
 		return asset(ctx, cfg, filename)
@@ -53,37 +57,40 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		return glob.sync(pat)
 	}
 
-	const [ defs, globals ] = await Promise.all([
+	const [ routes, globals ] = await Promise.all([
 		run(cfg.routes),
-		run(cfg.globals),
+		run(cfg.globals || Promise.resolve({})),
 	])
 
-	const routes = {}
-	for (const def of defs) {
-		const { url, component, props } = def
-		routes[url] = {
-			id: hash(path.resolve(ctx.config.root, component)),
-			url,
-			component,
-			props,
-		}
-	}
-
 	const m : Manifest = {
-		root: pth,
 		...cfg,
+		images: {
+			gip: cfg.images && "gip" in cfg.images ? cfg.images.gip : true,
+			sizes: cfg.images?.sizes || [ Infinity ],
+			formats: cfg.images?.formats || {
+				jpeg: [ "jpeg" ],
+				webp: [ "webp" ],
+				png: [ "png" ],
+			},
+			quality: cfg.images?.quality || 90,
+		},
+		root: pth,
 		dictionary: cfg.dictionary || defaults.dictionary,
 		globals,
-		routes,
+		routes: routes.map((route : _RouteDef) : RouteDef => ({
+			...route,
+			id: hash(path.resolve(ctx.config.root, route.component)),
+		})),
 		assets: Array.from(assets),
 		globs: Array.from(globs),
+		browsers: cfg.browsers || [ "> 2%" ],
 	}
 
 	await ctx.writeCache("manifest.json", JSON.stringify(m))
 	return m
 }
 
-function run<T> (fn : () => T) : T {
+function run<T> (fn : Promise<T> | () => Promise<T>) : Promise<T> {
 	if (typeof fn === "function") {
 		return fn()
 	}

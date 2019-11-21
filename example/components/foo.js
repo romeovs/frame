@@ -1,10 +1,14 @@
-import React from "react"
+import * as React from "react"
 import styles from "./foo.css"
 
-export default function Foo (props) : React.Node {
+export type FooProps = {
+	init : number,
+}
+
+export default function Foo (props : FooProps) : React.Node {
 	return (
 		<div className={styles.foo}>
-			Foo
+			Foo: <pre>2 * {props.init} = {2 * props.init}</pre>
 		</div>
 	)
 }

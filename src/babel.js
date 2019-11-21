@@ -1,9 +1,11 @@
 import path from "path"
 import babelPlugin from "rollup-plugin-babel"
 
+import { type Compilation } from "./compilation"
+
 const extensions = [ ".js" ]
 
-export function babel (ctx : Comilation, server : boolean, modern : boolean) : babelPlugin {
+export function babel (ctx : Compilation, server : boolean, modern : boolean) : babelPlugin {
 	return babelPlugin({
 		babelrc: false,
 		exclude: "node_modules/**",
@@ -18,7 +20,7 @@ export function config (ctx : Compilation, server : boolean, modern : boolean) :
 			? { node: true }
 			: modern
 				? { esmodules: true }
-				: ctx.config.browsers
+				: {}
 
 	return {
 		presets: [
@@ -37,7 +39,7 @@ export function config (ctx : Compilation, server : boolean, modern : boolean) :
 				{
 					all: true,
 				},
-			]
+			],
 		],
 		plugins: [
 			"babel-plugin-transform-dirname-filename",

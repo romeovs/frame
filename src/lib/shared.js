@@ -5,9 +5,12 @@ export type Context = {
 	globals : Globals,
 }
 
-export const context = React.createContext({
+const defaults : Context = {
 	globals: {},
-})
+}
+
+/* eslint-disable no-extra-parens */
+export const context = React.createContext<Context>(defaults)
 
 export function useFrame () : Context {
 	return React.useContext(context)

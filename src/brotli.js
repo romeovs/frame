@@ -1,6 +1,7 @@
 import Brotli from "brotli"
 
 import { Timer } from "./timer"
+import { type Compilation } from "./compilation"
 
 const exts = [
 	".js",
@@ -12,7 +13,7 @@ const exts = [
 ]
 
 // Brotli compress the contents and write to filename
-export async function brotli (ctx : Compilation, filename : string, content : string) {
+export async function brotli (ctx : Compilation, filename : string, content : string | Buffer) {
 	const timer = new Timer()
 	if (ctx.config.dev || !brotliable(filename)) {
 		return

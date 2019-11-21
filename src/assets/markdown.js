@@ -8,6 +8,7 @@ import { type Compilation } from "../compilation"
 import { type Manifest } from "../manifest"
 
 export type MarkdownAsset = {
+	id : string,
 	type : "markdown",
 	html : string,
 	prematter : mixed,

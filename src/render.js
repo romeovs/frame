@@ -7,31 +7,28 @@ import { minify } from "./min-html"
 import { props } from "./props"
 
 import { type Compilation } from "./compilation"
-import { type Manifest } from "./manifest"
+import { type Manifest, type RouteDef } from "./manifest"
+import { type BuildAssets, type Stylesheet, type Script } from "./client"
+import { type RouteProps } from "./config"
 
-type JS = {
-	modern : JSMap,
-	legacy : JSMap,
-	server : JSMap,
-	system : string,
+type Assets = {
+	modern : BuildAssets,
+	legacy : BuildAssets,
+	server : BuildAssets,
+	system : Script[],
 }
 
 
-export async function render (ctx : Compilation, manifest : Manifest, js : JS) {
-	const promises = []
-	for (const url in manifest.routes) {
-		const route = manifest.routes[url]
-		promises.push(one(ctx, manifest, js, route))
-	}
-
+export async function render (ctx : Compilation, manifest : Manifest, assets : Assets) {
+	const promises = manifest.routes.map(route => one(ctx, manifest, assets, route))
 	await Promise.all(promises)
 }
 
-async function one (ctx : Compilation, manifest : Manifest, js : JS, route : RouteDef) {
-	const server = js.server.find(f => f.id === route.id)?.src
-	const modern = js.modern.find(f => f.id === route.id)?.src
-	const legacy = js.legacy.find(f => f.id === route.id)?.src
-	const css = (js.modern || js.legacy).filter(f => f.type === "css")
+async function one (ctx : Compilation, manifest : Manifest, assets : Assets, route : RouteDef) {
+	const server = assets.server.find(f => f.type === "js" && f.id === route.id)?.src
+	const modern = assets.modern.find(f => f.type === "js" && f.id === route.id)?.src
+	const legacy = assets.legacy.find(f => f.type === "js" && f.id === route.id)?.src
+	const css = stylesheets(assets.modern || assets.legacy)
 
 	global._frame_context = {
 		globals: manifest.globals,
@@ -40,8 +37,10 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 	let body = ""
 	let head = []
 	if (server) {
-		/* eslint-disable global-require */
-		const [ Component, head_ ] = require(server)
+		/* eslint-disable global-require, no-extra-parens */
+		// $ExpectError: Flow cannot handle dynamic imports
+		const [ Component, head_ ] = (require(server) : [ React.Component<RouteProps>, React.Node[] ])
+
 		body = DOM.renderToString(<Component {...route.props} />)
 		head = head_.map(tag => (
 			<React.Fragment key={Math.random()}>
@@ -52,7 +51,7 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 
 	const pcss =
 		ctx.config.dev
-			? css.map(asset => asset.content).join(" ")
+			? css.map(asset => asset.type === "css" ? asset.content : "").join(" ")
 			: purge(ctx, body, css)
 
 	const propsfile = await props(ctx, manifest, route.props)
@@ -62,11 +61,10 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 			body={body}
 			modern={modern}
 			legacy={legacy}
-			system={js.system}
+			system={assets.system}
 			css={pcss}
 			cssfiles={css.map(asset => asset.src)}
 			propsfile={propsfile}
-			globalsfile={manifest.globalsFile}
 			head={head}
 		/>,
 	)
@@ -75,4 +73,15 @@ async function one (ctx : Compilation, manifest : Manifest, js : JS, route : Rou
 	const min = ctx.config.dev ? html : minify(ctx, html)
 
 	await ctx.write(`${route.url}/index.html`, min)
+}
+
+function stylesheets (assets : BuildAssets) : Stylesheet[] {
+	const res : Stylesheet[] = []
+	for (const asset of assets) {
+		if (asset.type === "css") {
+			res.push(asset)
+		}
+	}
+
+	return res
 }

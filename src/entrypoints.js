@@ -13,17 +13,17 @@ export type Entrypoint = {
 	id : string,
 	component : string,
 	entrypoint : string,
+	path : string,
 }
 
 export type Entrypoints = Entrypoint[]
 
-export async function entrypoints (ctx : Compilation, manifest : Manifest) : Entrypoints {
+export async function entrypoints (ctx : Compilation, manifest : Manifest) : Promise<Entrypoints> {
 	const timer = new Timer()
 
 	const promises = []
-	for (const url in manifest.routes) {
-		const { component } = manifest.routes[url]
-		promises.push(entrypoint(ctx, component))
+	for (const route of manifest.routes) {
+		promises.push(entrypoint(ctx, route.component))
 	}
 
 	const res = await Promise.all(promises)
@@ -32,7 +32,7 @@ export async function entrypoints (ctx : Compilation, manifest : Manifest) : Ent
 	return res
 }
 
-async function entrypoint (ctx : Compilation, component : string) : Entrypoint {
+async function entrypoint (ctx : Compilation, component : string) : Promise<Entrypoint> {
 	const fname = path.resolve(ctx.config.root, component)
 
 	const ast = template.program(`

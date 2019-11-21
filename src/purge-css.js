@@ -1,5 +1,7 @@
 import Purgecss from "purgecss"
 
+import { type Compilation } from "./compilation"
+
 type CSS = {
 	type : "css",
 	content : string,
@@ -21,6 +23,6 @@ export function purge (ctx : Compilation, markup : string, css : CSS[]) : string
 	return purgecss.purge().map(file => file.css).join("")
 }
 
-function clean (content : string) : stirng {
+function clean (content : string) : string {
 	return content.replace(/\/\*#[^/]+\*\//g, "")
 }

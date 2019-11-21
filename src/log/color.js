@@ -1,7 +1,7 @@
 type Color = number
 
 // A range of orange colors
-const colors : Color = [
+const colors : Color[] = [
 	29,
 	30,
 	31,

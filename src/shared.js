@@ -7,6 +7,7 @@ import * as pcss from "./postcss"
 
 import { format } from "./timer"
 import { jspath } from "./constants"
+import { type Compilation } from "./compilation"
 
 type Timings = {
 	string : [ number, number, number ],
@@ -19,7 +20,7 @@ export function print (ctx : Compilation, pfx : string, timings : Timings) {
 	}
 }
 
-export function plugins (ctx : Compilation) : mixed {
+export function plugins (ctx : Compilation) : mixed[] {
 	return [
 		postcss({
 			modules: {

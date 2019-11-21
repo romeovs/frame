@@ -1,4 +1,3 @@
-import process from "process"
 import printf from "printf"
 import { type Writable } from "stream"
 
@@ -8,6 +7,9 @@ import { type Level } from "./level"
 import { Logger } from "./base"
 
 export class SimpleLogger extends Logger {
+	_out : Writable
+	_timer : Timer
+
 	constructor (out : Writable = process.stdout) {
 		super()
 		this._timer = new Timer()

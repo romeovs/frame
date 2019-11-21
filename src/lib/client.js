@@ -1,4 +1,4 @@
-import React from "react"
+import * as React from "react"
 import DOM from "react-dom"
 import { HeadProvider } from "react-head"
 
@@ -13,37 +13,45 @@ export type { Asset }
 
 const dictionary = global.DICTIONARY || []
 
-export async function init (Component : React.AbstractComponent, dev : boolean) {
-	const {
-		p: compressedProps,
-		g: compressedGlobals,
-	} = await getlink("frameprops")
+export async function init (Component : React.ComponentType<mixed>, dev : boolean) {
+	const { g, p } = await getlink("frameprops")
+	if (typeof g !== "object" || !g || typeof p !== "object" || !p) {
+		throw Error("Props and globals should be objects")
+	}
 
-	const props = mapkv(compressedProps, v => decompress(dictionary, v))
-	const globals = mapkv(compressedGlobals, v => decompress(dictionary, v))
+	const props = mapkv(p, v => decompress(dictionary, v))
+	const globals = mapkv(g, v => decompress(dictionary, v))
+
+	const { key, ref, ...rest } = props
+
 	const comp = (
 		<context.Provider value={{ globals }}>
 			<HeadProvider>
-				<Component {...props} />
+				<Component {...rest} />
 			</HeadProvider>
 		</context.Provider>
 	)
 
+	const app = document.getElementById("app")
+	if (!app) {
+		throw Error("<div id=\"app\"> is missing")
+	}
+
 	if (global.DEV === "development") {
 		/* eslint-disable no-console */
 		console.log("This page is rendered with Frame.js")
-		DOM.render(comp, document.getElementById("app"))
+		DOM.render(comp, app)
 	} else {
-		DOM.hydrate(comp, document.getElementById("app"))
+		DOM.hydrate(comp, app)
 	}
 }
 
-async function getlink (id : string) : {[string] : mixed } {
-	const url = document.getElementById(id)?.href
-	if (!url) {
+async function getlink (id : string) : Promise<Object> {
+	const el = document.getElementById(id)
+	if (!(el instanceof HTMLLinkElement) || !el.href) {
 		return {}
 	}
 
-	const resp = await fetch(url)
+	const resp = await fetch(el.href)
 	return resp.json()
 }

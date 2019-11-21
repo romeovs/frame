@@ -2,15 +2,13 @@ import { mapkv } from "../map"
 import { inflate, deflate, type Dictionary } from "./dictionary"
 import * as image from "./image"
 
-type CompressedAsset = mixed
-
 const custom = {
 	image,
 }
 
 // Compress a single asset by renaming its keys and well-known values
 // using a predefined dictionary.
-export function compress (dict : Dictionary, asset : Asset) : CompressedAsset {
+export function compress (dict : Dictionary, asset : mixed) : mixed {
 	if (Array.isArray(asset)) {
 		return asset.map(el => compress(dict, el))
 	}
@@ -24,16 +22,16 @@ export function compress (dict : Dictionary, asset : Asset) : CompressedAsset {
 	}
 
 	const customized =
-		typeof asset === "object" && asset.type in custom
+		typeof asset.type === "string" && asset.type in custom
 			? custom[asset.type].compress(asset)
 			: asset
 
-	return mapkv(customized, x => deflate(dict, x))
+	return mapkv(customized, x => typeof x === "string" ? deflate(dict, x) : x)
 }
 
 // Deompress a single asset by renaming its keys and well-known values
 // using the predefined dictionary.
-export function decompress (dict : Dictionary, compressed : mixed) : Asset {
+export function decompress (dict : Dictionary, compressed : mixed) : mixed {
 	if (Array.isArray(compressed)) {
 		return compressed.map(el => decompress(dict, el))
 	}
@@ -46,10 +44,10 @@ export function decompress (dict : Dictionary, compressed : mixed) : Asset {
 		return compressed
 	}
 
-	const inflated = mapkv(compressed, x => inflate(dict, x))
+	const inflated = mapkv(compressed, x => typeof x === "string" ? inflate(dict, x) : x)
 
 	return (
-		typeof inflated === "object" && inflated.type in custom
+		typeof inflated.type === "string" && inflated.type in custom
 			? custom[inflated.type].decompress(inflated)
 			: inflated
 	)

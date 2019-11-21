@@ -12,10 +12,10 @@ export type YAMLAsset = {
 	content : mixed,
 }
 
-export async function yaml (ctx : Compilation, _ : Manifest, filename : string) : Asset {
-	const content = await fs.readFile(filename)
+export async function yaml (ctx : Compilation, _ : Manifest, filename : string) : Promise<YAMLAsset> {
+	const content = await fs.readFile(filename, "utf-8")
 	return {
-		type: "json",
+		type: "yaml",
 		id: hash(filename),
 		content: YAML.safeLoad(content),
 	}

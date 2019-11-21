@@ -18,15 +18,19 @@ export default {
 	dictionary: [
 		"title",
 	],
-	async routes () : RouteDef {
+	async routes () : Promise<RouteDef[]> {
 		const bars =
 			glob("bar/*.yml")
-				.map(async function (pth : string) : RouteDef {
+				.map(async function (pth : string) : Promise<RouteDef> {
 					const url = `/bar/${path.basename(pth).replace(".yml", "")}`
+					const info = await asset(pth)
 
-					return Route(url, "./components/bar", {
-						title: (await asset(pth)).content.title,
-					})
+					if (info.type !== "yaml") {
+						throw Error("Unexpected asset type")
+					}
+
+					// $ExpectError: TODO make Route generic
+					return Route(url, "./components/bar", info.content)
 				})
 
 		return [
