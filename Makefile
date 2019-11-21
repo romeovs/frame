@@ -4,6 +4,7 @@ BIN = ./node_modules/.bin
 ROLLUP = $(BIN)/rollup
 ESLINT = $(BIN)/eslint
 JEST = $(BIN)/jest
+FLOW = $(BIN)/flow
 
 # Logging helpers
 log_color = \033[34m
@@ -66,3 +67,8 @@ example.watch:
 .PHONY: example.clean
 example.clean:
 	@rm -r example/dist/js
+
+.PHONY: check
+check:
+	@$m "Typechecking..."
+	@$(FLOW) check

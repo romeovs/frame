@@ -1,0 +1,20 @@
+[ignore]
+.*/node_modules/.*
+.*/dist/.*
+.*/.frame_cache/.*
+
+[include]
+
+[libs]
+./flow-typed
+
+[lints]
+
+[options]
+all=true
+esproposal.optional_chaining=enable
+suppress_comment=\\(.\\|\n\\)*\\$ExpectError
+exact_by_default=true
+module.name_mapper='^frame/server$' ->'<PROJECT_ROOT>/src/lib/server'
+
+[strict]

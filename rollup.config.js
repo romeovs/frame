@@ -44,7 +44,12 @@ const base = {
 					},
 				],
 				"@babel/preset-react",
-				"@babel/preset-flow",
+				[
+					"@babel/preset-flow",
+					{
+						all: true,
+					},
+				],
 			],
 			plugins: [
 				"@babel/plugin-proposal-optional-chaining",

@@ -32,7 +32,12 @@ export function config (ctx : Compilation, server : boolean, modern : boolean) :
 				},
 			],
 			"@babel/preset-react",
-			"@babel/preset-flow",
+			[
+				"@babel/preset-flow",
+				{
+					all: true,
+				},
+			]
 		],
 		plugins: [
 			"babel-plugin-transform-dirname-filename",
