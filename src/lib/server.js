@@ -1,14 +1,13 @@
 import * as React from "react"
 import { HeadProvider } from "react-head"
 
-import { type RouteDef } from "../config"
+import { type RouteDef, type Component, type Routes } from "../config"
 import { type Asset } from "../assets"
-import { type RouteProps } from "../config"
 
 import { context } from "./shared"
 export { useFrame } from "./shared"
 
-export type { Asset, RouteDef }
+export type { Asset, RouteDef, Routes }
 
 export function glob (...segments : string[]) : string[] {
 	return global._frame_glob(...segments)
@@ -18,10 +17,11 @@ export function asset (path : string) : Promise<Asset> {
 	return global._frame_asset(path)
 }
 
-export function Route (url : string, component : string, props : RouteProps = {}) : RouteDef {
+export function Route<T> (url : string, component : Component<T>, props : T) : RouteDef<T> {
 	return {
 		url,
-		component,
+		import: "TODO",
+		id: "TODO",
 		props,
 	}
 }

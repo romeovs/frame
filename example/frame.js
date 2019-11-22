@@ -1,5 +1,8 @@
+import * as React from "react"
 import path from "path"
-import { Route, glob, asset, type RouteDef } from "frame/server"
+import { Route, glob, asset, type Routes, type RouteDef } from "frame/server"
+
+import { type BarProps } from "./components/bar"
 
 export default {
 	images: {
@@ -18,10 +21,10 @@ export default {
 	dictionary: [
 		"title",
 	],
-	async routes () : Promise<RouteDef[]> {
+	async routes () : Promise<Routes> {
 		const bars =
 			glob("bar/*.yml")
-				.map(async function (pth : string) : Promise<RouteDef> {
+				.map(async function (pth : string) : Promise<RouteDef<BarProps>> {
 					const url = `/bar/${path.basename(pth).replace(".yml", "")}`
 					const info = await asset(pth)
 
@@ -29,14 +32,23 @@ export default {
 						throw Error("Unexpected asset type")
 					}
 
-					// $ExpectError: TODO make Route generic
-					return Route(url, "./components/bar", info.content)
+					if (typeof info.content !== "object" || !info.content) {
+						throw Error("Need object with keys")
+					}
+
+					if (!("title" in info.content) || typeof info.content.title !== "string") {
+						throw Error("Missing title in content")
+					}
+
+					return Route(url, import("./components/bar"), {
+						title: info.content.title,
+					})
 				})
 
 		return [
 			...await Promise.all(bars),
-			Route("/foo", "./components/foo"),
-			Route("/", "./components/foo"),
+			Route("/foo", import("./components/foo"), { init: 1 }),
+			Route("/", import("./components/foo"), { init: 0 }),
 		]
 	},
 }

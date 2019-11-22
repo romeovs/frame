@@ -5,16 +5,16 @@ import { type Compilation } from "./compilation"
 
 const extensions = [ ".js" ]
 
-export function babel (ctx : Compilation, server : boolean, modern : boolean) : babelPlugin {
+export function babel (ctx : Compilation, server : boolean, modern : boolean, plugins : mixed[] = []) : babelPlugin {
 	return babelPlugin({
 		babelrc: false,
 		exclude: "node_modules/**",
 		extensions,
-		...config(ctx, server, modern),
+		...config(ctx, server, modern, plugins),
 	})
 }
 
-export function config (ctx : Compilation, server : boolean, modern : boolean) : mixed {
+export function config (ctx : Compilation, server : boolean, modern : boolean, plugins : mixed[] = []) : mixed {
 	const targets =
 		server
 			? { node: true }
@@ -44,6 +44,7 @@ export function config (ctx : Compilation, server : boolean, modern : boolean) :
 		plugins: [
 			"babel-plugin-transform-dirname-filename",
 			"@babel/plugin-syntax-dynamic-import",
+			...plugins,
 			"@babel/plugin-proposal-optional-chaining",
 			...ctx.config.dev ? [] : [ "babel-plugin-flow-react-proptypes" ],
 			[

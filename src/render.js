@@ -7,9 +7,9 @@ import { minify } from "./min-html"
 import { props } from "./props"
 
 import { type Compilation } from "./compilation"
-import { type Manifest, type RouteDef } from "./manifest"
+import { type Manifest } from "./manifest"
 import { type BuildAssets, type Stylesheet, type Script } from "./client"
-import { type RouteProps } from "./config"
+import { type RouteDef } from "./config"
 
 type Assets = {
 	modern : BuildAssets,
@@ -18,13 +18,12 @@ type Assets = {
 	system : Script[],
 }
 
-
 export async function render (ctx : Compilation, manifest : Manifest, assets : Assets) {
 	const promises = manifest.routes.map(route => one(ctx, manifest, assets, route))
 	await Promise.all(promises)
 }
 
-async function one (ctx : Compilation, manifest : Manifest, assets : Assets, route : RouteDef) {
+async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, route : RouteDef<T>) {
 	const server = assets.server.find(f => f.type === "js" && f.id === route.id)?.src
 	const modern = assets.modern.find(f => f.type === "js" && f.id === route.id)?.src
 	const legacy = assets.legacy.find(f => f.type === "js" && f.id === route.id)?.src
@@ -39,7 +38,7 @@ async function one (ctx : Compilation, manifest : Manifest, assets : Assets, rou
 	if (server) {
 		/* eslint-disable global-require, no-extra-parens */
 		// $ExpectError: Flow cannot handle dynamic imports
-		const [ Component, head_ ] = (require(server) : [ React.Component<RouteProps>, React.Node[] ])
+		const [ Component, head_ ] = (require(server) : [ React.Component<T>, React.Node[] ])
 
 		body = DOM.renderToString(<Component {...route.props} />)
 		head = head_.map(tag => (

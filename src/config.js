@@ -1,5 +1,6 @@
 import path from "path"
 
+import * as React from "react"
 import { rollup } from "rollup"
 
 import { babel } from "./babel"
@@ -19,16 +20,18 @@ export type ImageConfig = {
 	},
 }
 
-export type RouteProps = {
-	key? : string | number,
-	...,
+type ESModule<T> = { default : T, ... }
+type ESImport<T> = Promise<ESModule<T>>
+export type Component<T> = ESImport<React.ComponentType<T>>
+
+export type RouteDef<T> = {
+	url : string,
+	id : string,
+	import : string,
+	props : T,
 }
 
-export type RouteDef = {
-	url : string,
-	component : string,
-	props : RouteProps,
-}
+export type Routes = RouteDef<*>[]
 
 export type Globals = $ReadOnly<{
 	[string] : mixed,
@@ -40,7 +43,7 @@ export type FrameDefinition = {
 	images? : ImageConfig,
 
 	// The routes of the site, with their respective props
-	routes : () => Promise<RouteDef[]>,
+	routes : () => Promise<RouteDef<*>[]>,
 
 	// Globals shared between js and css
 	globals? : () => Promise<Globals>,
@@ -61,7 +64,9 @@ export async function load (ctx : Compilation, filename : string) : Promise<Fram
 		},
 		treeshake: false,
 		onwarn: warnings.push,
-		plugins: [ babel(ctx, true, false) ],
+		plugins: [
+			babel(ctx, true, false, [ plugin ]),
+		],
 	})
 
 	const output = await bundle.generate({
@@ -74,6 +79,11 @@ export async function load (ctx : Compilation, filename : string) : Promise<Fram
 	const jsloader = require.extensions[".js"]
 
 	// $ExpectError: Flow does not know about require.extensions
+	require.extensions[".css"] = function (module : Module, fname : string) {
+		module._compile("{}")
+	}
+
+	// $ExpectError: Flow does not know about require.extensions
 	require.extensions[".js"] = function (module : Module, fname : string) {
 		if (filename === fname) {
 			module._compile(output.output[0].code, fname)
@@ -83,6 +93,7 @@ export async function load (ctx : Compilation, filename : string) : Promise<Fram
 	}
 
 	delete require.cache[filename]
+
 	/* eslint-disable global-require */
 	const cfg = require(filename).default
 
@@ -90,4 +101,27 @@ export async function load (ctx : Compilation, filename : string) : Promise<Fram
 	require.extensions[".js"] = jsloader
 
 	return cfg
+}
+
+function plugin (babel : mixed) : mixed {
+	// $ExpectError: Flow does not know babel
+	const t = babel.types
+	return {
+		visitor: {
+			CallExpression (pth : mixed, state : mixed) {
+				// $ExpectError: Flow does not know babel
+				const { callee, arguments: args } = pth.node
+				if (callee.name !== "Route") {
+					return
+				}
+
+				// $ExpectError: Flow does not know babel
+				pth.replaceWith(t.objectExpression([
+					t.objectProperty(t.stringLiteral("url"), args[0]),
+					t.objectProperty(t.stringLiteral("import"), args[1].arguments[0]),
+					t.objectProperty(t.stringLiteral("props"), args[2]),
+				]))
+			},
+		},
+	}
 }

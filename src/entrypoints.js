@@ -23,7 +23,7 @@ export async function entrypoints (ctx : Compilation, manifest : Manifest) : Pro
 
 	const promises = []
 	for (const route of manifest.routes) {
-		promises.push(entrypoint(ctx, route.component))
+		promises.push(entrypoint(ctx, route.import))
 	}
 
 	const res = await Promise.all(promises)

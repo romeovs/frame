@@ -4,12 +4,11 @@ import { mapkv } from "./map"
 
 import { type Compilation } from "./compilation"
 import { type Manifest } from "./manifest"
-import { type RouteProps } from "./config"
 
 
-export function props (ctx : Compilation, manifest : Manifest, p : RouteProps) : Promise<string> {
+export function props<T> (ctx : Compilation, manifest : Manifest, p : T) : Promise<string> {
 	const data = {
-		p: mapkv(p, v => compress(manifest.dictionary, v)),
+		p: typeof p !== "object" || !p ? {} : mapkv(p, v => compress(manifest.dictionary, v)),
 		g: mapkv(manifest.globals, v => compress(manifest.dictionary, v)),
 	}
 

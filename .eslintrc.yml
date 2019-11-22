@@ -267,7 +267,7 @@ rules:
 
   # Disallows use of the existential type (*)
   flowtype/no-existential-type:
-    - error
+    - off
 
   # Disallows $FlowFixMe comment suppressions
   flowtype/no-flow-fix-me-comments:

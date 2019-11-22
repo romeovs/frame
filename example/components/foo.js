@@ -1,5 +1,6 @@
 import * as React from "react"
-import styles from "./foo.css"
+// import styles from "./foo.css"
+const styles = {}
 
 export type FooProps = {
 	init : number,

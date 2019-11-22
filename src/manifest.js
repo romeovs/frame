@@ -2,15 +2,10 @@ import path from "path"
 import glob from "glob"
 
 import { type Compilation } from "./compilation"
-import { load, type RouteDef as _RouteDef, type ImageConfig, type FrameDefinition, type Globals } from "./config"
+import { load, type ImageConfig, type RouteDef, type FrameDefinition, type Globals } from "./config"
 import { hash } from "./hash"
 import { asset, type Asset } from "./assets"
 import * as defaults from "./defaults"
-
-export type RouteDef = {
-	..._RouteDef,
-	id : string,
-}
 
 export type Manifest = {
 	// The root frame file the manifest was built from
@@ -20,7 +15,7 @@ export type Manifest = {
 	images : ImageConfig,
 
 	// The routes of the site, with their respective props
-	routes : RouteDef[],
+	routes : RouteDef<*>[],
 
 	// All assets that were loaded in the manifest file
 	assets : string[],
@@ -77,9 +72,9 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		root: pth,
 		dictionary: cfg.dictionary || defaults.dictionary,
 		globals,
-		routes: routes.map((route : _RouteDef) : RouteDef => ({
+		routes: routes.map(route => ({
 			...route,
-			id: hash(path.resolve(ctx.config.root, route.component)),
+			id: hash(route.import),
 		})),
 		assets: Array.from(assets),
 		globs: Array.from(globs),
