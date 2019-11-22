@@ -14,6 +14,7 @@ import { type Manifest } from "./manifest"
 import { type Entrypoints } from "./entrypoints"
 import { type Script } from "./client"
 import * as pcss from "./postcss"
+import { full } from "./compress/dictionary"
 
 interface Emitter {
 	on ("build", (BuildAssets => void) | (BuildAssets => Promise<void>)) : void,
@@ -23,7 +24,7 @@ interface Emitter {
 export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints) : Emitter {
 	ctx.log("Watching client")
 
-	const cfg = config(ctx, entrypoints)
+	const cfg = config(ctx, manifest, entrypoints)
 	const w = webpack(cfg)
 
 	// $ExpectError: TODO, can we coerce here?
@@ -71,7 +72,7 @@ export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Ent
 	return evts
 }
 
-function config (ctx : Compilation, entrypoints : Entrypoints) : WebpackOptions {
+function config (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoints) : WebpackOptions {
 	const f = Array.from(new Set(entrypoints.map(e => e.entrypoint)))
 	const entries = {}
 	for (const e of f) {
@@ -128,6 +129,12 @@ function config (ctx : Compilation, entrypoints : Entrypoints) : WebpackOptions 
 		},
 		plugins: [
 			new webpack.HotModuleReplacementPlugin(),
+			new webpack.DefinePlugin({
+				"process.env.NODE_ENV": "\"development\"",
+				"global.DEV": "true",
+				"global.DICTIONARY": JSON.stringify(manifest.dictionary || []),
+				"global.ALPHABET": JSON.stringify(full.substring(0, manifest.dictionary.length)),
+			}),
 		],
 	}
 }
