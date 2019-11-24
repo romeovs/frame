@@ -135,14 +135,17 @@ async function exists (ctx : Compilation, pfx : string, size : number | string, 
 		return null
 	}
 
-	const files = await fs.readdir(path.join(ctx.config.output, impath, pfx))
+	try {
+		const files = await fs.readdir(path.join(ctx.config.output, impath, pfx))
+		const found = files.find(file => file.startsWith(`${size}.`) && file.endsWith(`.${format}`))
+		if (!found) {
+			return null
+		}
 
-	const found = files.find(file => file.startsWith(`${size}.`) && file.endsWith(`.${format}`))
-	if (!found) {
+		return `/${impath}/${pfx}/${found}`
+	} catch (err) {
 		return null
 	}
-
-	return `/${impath}/${pfx}/${found}`
 }
 
 function quality (manifest : FrameDefinition, format : ImageFormat) : number {
