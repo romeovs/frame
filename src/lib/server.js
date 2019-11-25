@@ -7,7 +7,7 @@ import { type Asset } from "../assets"
 import { context } from "./shared"
 export { useFrame } from "./shared"
 
-export type { Asset, RouteDef, Routes }
+export type { Asset, RouteDef, Routes, Component }
 
 export function glob (...segments : string[]) : string[] {
 	return global._frame_glob(...segments)
