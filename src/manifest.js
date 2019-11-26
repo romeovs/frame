@@ -74,7 +74,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		globals,
 		routes: routes.map(route => ({
 			...route,
-			id: hash(route.import),
+			id: hash(path.resolve(ctx.config.root, route.import)),
 		})),
 		assets: Array.from(assets),
 		globs: Array.from(globs),
