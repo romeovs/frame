@@ -23,7 +23,7 @@ list:
 	@echo "example src:"
 	@echo $(EXM_FILES) | xargs -n1 -- echo "  "
 
-cli: dist/cli.js
+cli: dist/cli.js types
 
 dist/cli.js: $(SRC_FILES) rollup.config.js
 	@$m "Building cli..."
@@ -73,12 +73,12 @@ check:
 	@$m "Typechecking..."
 	@$(FLOW) check
 
-types: dist/client.js.flow dist/server.js.flow
+types: dist/lib/client.js.flow dist/lib/server.js.flow
 
-dist/client.js.flow: $(SRC_FILES) scripts/types.js
+dist/lib/client.js.flow: $(SRC_FILES) scripts/types.js
 	@$m "Gathering client types..."
 	@babel-node scripts/types.js frame src/lib/client.js > $@
 
-dist/server.js.flow: $(SRC_FILES) scripts/types.js
+dist/lib/server.js.flow: $(SRC_FILES) scripts/types.js
 	@$m "Gathering server types..."
 	@babel-node scripts/types.js frame/server src/lib/server.js > $@

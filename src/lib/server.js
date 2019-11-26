@@ -2,12 +2,23 @@ import * as React from "react"
 import { HeadProvider } from "react-head"
 
 import { type RouteDef, type Component, type Routes } from "../config"
-import { type Asset } from "../assets"
+import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
+import { type ImageFormat } from "../config"
 
 import { context } from "./shared"
 export { useFrame } from "./shared"
 
-export type { Asset, RouteDef, Routes, Component }
+export type {
+	Asset,
+	RouteDef,
+	Routes,
+	Component,
+	JSONAsset,
+	YAMLAsset,
+	ImageAsset,
+	ImageFormat,
+	MarkdownAsset,
+}
 
 export function glob (...segments : string[]) : string[] {
 	return global._frame_glob(...segments)

@@ -8,8 +8,17 @@ import { context } from "./shared"
 
 export { useFrame } from "./shared"
 
-import { type Asset } from "../assets"
-export type { Asset }
+import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
+import { type ImageFormat } from "../config"
+
+export type {
+	Asset,
+	JSONAsset,
+	YAMLAsset,
+	ImageAsset,
+	MarkdownAsset,
+	ImageFormat,
+}
 
 const dictionary = global.DICTIONARY || []
 

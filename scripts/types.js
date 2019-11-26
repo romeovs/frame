@@ -7,10 +7,9 @@ import traverse from "@babel/traverse"
 import generate from "@babel/generator"
 
 async function main () {
-	const name = process.argv[2]
-	const file = process.argv[3]
+	const [ , , name, entry ] = process.argv
 
-	const files = new Set([ file ])
+	const files = new Set([ entry ])
 	const done = new Set()
 	const exports = new Set()
 	let types = {}
@@ -21,7 +20,7 @@ async function main () {
 			break
 		}
 
-		const file = Array.from(files.values())[0]
+		const [ file ] = Array.from(files.values())
 		if (!file) {
 			break
 		}
@@ -43,15 +42,17 @@ async function main () {
 		done.add(file)
 	}
 
+	// TODO: remove stuff that is not exported
+
 	const code =
 		Object.keys(types)
 			.map(function (name : string) : string {
 				const t = types[name]
 				if (exports.has(name)) {
 					if (t.startsWith("function") || t.startsWith("async function")) {
-						return `declare ${t}`.replace("async function", "function")
+						return `declare export ${t}`.replace("async function", "function")
 					}
-					return `declare ${t}`
+					return `declare export ${t}`
 				}
 
 				if (t.startsWith("function") || t.startsWith("async function")) {

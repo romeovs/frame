@@ -10,6 +10,7 @@ import { json, type JSONAsset } from "./json"
 import { yaml, type YAMLAsset } from "./yaml"
 import { markdown, type MarkdownAsset } from "./markdown"
 
+export type { ImageAsset, JSONAsset, YAMLAsset, MarkdownAsset }
 export type Asset = ImageAsset | JSONAsset | YAMLAsset | MarkdownAsset
 
 // The type of asset handler functions

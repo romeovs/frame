@@ -1,17 +1,16 @@
 import React from "react"
-import { type Globals } from "../config"
 
-export type Context = {
+export type Context<Globals> = {
 	globals : Globals,
 }
 
-const defaults : Context = {
+const defaults : Context<{}> = {
 	globals: {},
 }
 
 /* eslint-disable no-extra-parens */
-export const context = React.createContext<Context>(defaults)
+export const context = React.createContext<Context<{}>>(defaults)
 
-export function useFrame () : Context {
+export function useFrame<T> () : Context<T> {
 	return React.useContext(context)
 }
