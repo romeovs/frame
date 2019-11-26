@@ -37,13 +37,13 @@ export function Route<T> (url : string, component : Component<T>, props : T) : R
 	}
 }
 
-export function init<T> (Component : React.ComponentType<T>) : [ React.ComponentType<T>, React.Node[]] {
+export function init<T> (C : React.ComponentType<T>) : [ React.ComponentType<T>, React.Node[]] {
 	const head = []
 	function Comp (props : T) : React.Node {
 		return (
 			<context.Provider value={global._frame_context}>
 				<HeadProvider headTags={head}>
-					<Component {...props} />
+					<C {...props} />
 				</HeadProvider>
 			</context.Provider>
 		)

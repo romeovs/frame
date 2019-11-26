@@ -36,6 +36,12 @@ export function HTML (props : HTMLProps) : React.Node {
 	)
 }
 
+HTML.defaultProps = {
+	legacy: null,
+	modern: null,
+	system: [],
+}
+
 type SystemProps = {
 	href : string,
 }
