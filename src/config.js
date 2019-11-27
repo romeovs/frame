@@ -103,9 +103,9 @@ export async function load (ctx : Compilation, filename : string) : Promise<Fram
 	return cfg
 }
 
-function plugin (babel : mixed) : mixed {
+function plugin (Babel : mixed) : mixed {
 	// $ExpectError: Flow does not know babel
-	const t = babel.types
+	const t = Babel.types
 	return {
 		visitor: {
 			CallExpression (pth : mixed, state : mixed) {

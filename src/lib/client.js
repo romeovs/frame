@@ -58,6 +58,7 @@ export async function init (Component : React.ComponentType<mixed>, dev : boolea
 	}
 }
 
+// eslint-disable-next-line flowtype/no-weak-types
 async function getlink (id : string) : Promise<Object> {
 	const el = document.getElementById(id)
 	if (!(el instanceof HTMLLinkElement) || !el.href) {
