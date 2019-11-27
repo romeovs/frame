@@ -1,0 +1,54 @@
+declare module "frame" {
+	import type { Node } from "react"
+
+	declare type Context<Globals> = {
+		globals: Globals,
+	}
+
+	declare export function useFrame<Globals>() : Context<Globals>
+	declare export function Picture(props : PictureProps) : Node
+	declare export function init (Component : React.ComponentType<mixed>, dev : boolean) : void
+
+	declare type SrcSet = {
+		src : string,
+		srcSet : string,
+	}
+
+	declare export var srcSet : {
+		w : (ImageAsset, ImageFormat) => SrcSet,
+		h : (ImageAsset, ImageFormat) => SrcSet,
+	}
+
+	declare export type ImageAsset = {
+		type : "image",
+		id : string,
+		width : number,
+		height : number,
+		formats : ImageFormat[],
+		matrix : string[],
+		color : ?string,
+		gradient : ?string[],
+	}
+
+	declare export type JSONAsset = {
+		type : "json",
+		id : string,
+		content : mixed,
+	}
+
+	declare export type MarkdownAsset = {
+		id : string,
+		type : "markdown",
+		html : string,
+		prematter : mixed,
+	}
+
+	declare export type YAMLAsset = {
+		type : "yaml",
+		id : string,
+		content : mixed,
+	}
+
+	declare export type ImageFormat = "jpeg" | "webp" | "png" | "tiff" | "gif"
+	declare export type Asset = ImageAsset | JSONAsset | YAMLAsset | MarkdownAsset
+}

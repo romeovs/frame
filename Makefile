@@ -72,3 +72,8 @@ example.clean:
 check:
 	@$m "Typechecking..."
 	@$(FLOW) check
+
+types: dist/lib/client.js.flow dist/lib/server.js.flow
+
+dist/lib/%.js.flow: src/lib/%.js.flow
+	@cp $< $@
