@@ -20,6 +20,8 @@ export type {
 	ImageFormat,
 }
 
+export { srcSet } from "./srcset"
+
 const dictionary = global.DICTIONARY || []
 
 export async function init (Component : React.ComponentType<mixed>, dev : boolean) {
