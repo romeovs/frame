@@ -1571,7 +1571,7 @@ rules:
 
   # Enforce a defaultProps definition for every prop that is not a required prop
   react/require-default-props:
-    - warn
+    - off
 
   # Enforce ES5 or ES6 class for returning value in render function
   react/require-render-return:
