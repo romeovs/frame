@@ -68,7 +68,14 @@ function info (image : ImageAsset, url : string) : ?ImageInfo {
 	}
 }
 
-export const srcSet = {
+type SrcSetter = (ImageAsset, ?ImageFormat) => SrcSet
+
+type SrcSetters = {
+	w : SrcSetter,
+	h : SrcSetter,
+}
+
+export const srcSet : SrcSetters = {
 	w: mkSrcSet({
 		bySize (a : ImageInfo, b : ImageInfo) : number {
 			return Math.sign(a.width - b.width)
