@@ -72,13 +72,3 @@ example.clean:
 check:
 	@$m "Typechecking..."
 	@$(FLOW) check
-
-types: dist/lib/client.js.flow dist/lib/server.js.flow
-
-dist/lib/client.js.flow: $(SRC_FILES) scripts/types.js
-	@$m "Gathering client types..."
-	@babel-node scripts/types.js frame src/lib/client.js > $@
-
-dist/lib/server.js.flow: $(SRC_FILES) scripts/types.js
-	@$m "Gathering server types..."
-	@babel-node scripts/types.js frame/server src/lib/server.js > $@
