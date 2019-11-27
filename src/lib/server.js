@@ -7,6 +7,8 @@ import { type ImageFormat } from "../config"
 
 import { context } from "./shared"
 export { useFrame } from "./shared"
+export { default as Picture } from "./picture"
+export { srcSet } from "./srcset"
 
 export type {
 	Asset,
