@@ -46,7 +46,8 @@ export function config (ctx : Compilation, server : boolean, modern : boolean, p
 			"@babel/plugin-syntax-dynamic-import",
 			...plugins,
 			"@babel/plugin-proposal-optional-chaining",
-			...ctx.config.dev ? [] : [ "babel-plugin-flow-react-proptypes" ],
+			// TODO: add again when we can import non local types
+			// ...ctx.config.dev ? [ "babel-plugin-flow-react-proptypes" ] : [],
 			[
 				"babel-plugin-module-resolver",
 				{
