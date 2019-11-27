@@ -37,8 +37,8 @@ export function HTML (props : HTMLProps) : React.Node {
 }
 
 HTML.defaultProps = {
-	legacy: null,
-	modern: null,
+	legacy: undefined,
+	modern: undefined,
 	system: [],
 }
 
