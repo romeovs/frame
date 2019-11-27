@@ -7,6 +7,8 @@ import { mapkv } from "../map"
 import { context } from "./shared"
 
 export { useFrame } from "./shared"
+export { default as Picture } from "./picture"
+export { srcSet } from "./srcset"
 
 import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
 import { type ImageFormat } from "../config"
@@ -20,7 +22,6 @@ export type {
 	ImageFormat,
 }
 
-export { srcSet } from "./srcset"
 
 const dictionary = global.DICTIONARY || []
 
