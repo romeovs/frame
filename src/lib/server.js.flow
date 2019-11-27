@@ -1,6 +1,5 @@
 declare module "frame/server" {
 	import type { Node, ComponentType } from "react"
-	import type { Asset } from "frame"
 
 	declare type Context<Globals> = {
 		globals: Globals,
@@ -54,7 +53,6 @@ declare module "frame/server" {
 	declare export type Asset = ImageAsset | JSONAsset | YAMLAsset | MarkdownAsset
 
 
-	declare export type ImageFormat = "jpeg" | "webp" | "png" | "tiff" | "gif"
 	declare export type ImageConfig = {
 		gip : boolean,
 		sizes : number[],
