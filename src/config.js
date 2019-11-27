@@ -4,6 +4,7 @@ import * as React from "react"
 import { rollup } from "rollup"
 
 import { babel } from "./babel"
+import { plugins } from "./shared"
 import { type Compilation } from "./compilation"
 
 export type ImageFormat = "jpeg" | "webp" | "png" | "tiff" | "gif"
@@ -66,12 +67,14 @@ export async function load (ctx : Compilation, filename : string) : Promise<Fram
 		onwarn: warnings.push,
 		plugins: [
 			babel(ctx, true, false, [ plugin ]),
+			...plugins(ctx),
 		],
 	})
 
 	const output = await bundle.generate({
 		exports: "named",
 		format: "cjs",
+		dir: "/tmp",
 	})
 
 	// temporarily overwrite require
