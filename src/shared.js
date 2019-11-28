@@ -2,6 +2,7 @@ import EventEmitter from "events"
 
 import postcss from "rollup-plugin-postcss"
 import url from "@rollup/plugin-url"
+import json from "@rollup/plugin-json"
 
 import * as pcss from "./postcss"
 
@@ -47,6 +48,7 @@ export function plugins (ctx : Compilation) : mixed[] {
 			],
 			publicPath: `/${jspath}/`,
 		}),
+		json(),
 	]
 }
 
