@@ -1,7 +1,7 @@
 import EventEmitter from "events"
 
 import postcss from "rollup-plugin-postcss"
-import url from "rollup-plugin-url"
+import url from "@rollup/plugin-url"
 
 import * as pcss from "./postcss"
 
