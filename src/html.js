@@ -25,7 +25,6 @@ export function HTML (props : HTMLProps) : React.Node {
 				{head}
 				{css && <style>{css}</style>}
 				{propsfile && <link id="frameprops" href={propsfile} rel="prefetch" />}
-				<link rel="icon" href="data:," />
 			</head>
 			<body>
 				<div id="app" dangerouslySetInnerHTML={{ __html: body }} />
