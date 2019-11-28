@@ -73,7 +73,7 @@ check:
 	@$m "Typechecking..."
 	@$(FLOW) check
 
-types: dist/types/frame.js.flow dist/types/frame-server.js.flow
+types: dist/types/frame.js.flow dist/types/frame-server.js.flow dist/types/react-head.js.flow
 
 dist/types/%.js.flow: src/types/%.js.flow
 	@mkdir -p dist/types
