@@ -3,11 +3,11 @@ declare module "react-head" {
 
 	declare export var HeadProvider : ComponentType<{
 		headTags? : Array<Element<any>>,
-		children : React.Node,
+		children : Node,
 	}>
 
-	declare export var Title : React.ComponentType<{ children : Node }>
-	declare export var Style : React.ComponentType<{ children : Node }>
+	declare export var Title : ComponentType<{ children : Node }>
+	declare export var Style : ComponentType<{ children : Node }>
 
 	declare export var Link : ComponentType<{
 		rel : string,

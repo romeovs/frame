@@ -1,13 +1,31 @@
+import { type Node, type ComponentType } from "react"
+
 declare module "frame/server" {
-	import type { Node, ComponentType } from "react"
 
 	declare type Context<Globals> = {
-		globals: Globals,
+		globals : Globals,
 	}
 
 	declare export function useFrame<Globals>() : Context<Globals>
-	declare export function Picture(props : PictureProps) : Node
 	declare export function init (Component : ComponentType<mixed>, dev : boolean) : void
+
+	declare type PictureProps = {
+		// The image to get the sources from
+		image : ImageAsset,
+
+		// The sizes prop to pass to the source and img tags
+		sizes : string,
+
+		// What direction to pick the srcSet in
+		dimension? : "w" | "h",
+
+		// The format to use for the fallback img
+		fallbackFormat? : ImageFormat,
+
+		...,
+	}
+
+	declare export function Picture(props : PictureProps) : Node
 
 	declare type SrcSet = {
 		src : string,
