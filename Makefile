@@ -14,6 +14,7 @@ m = printf "$(log_color)$(log_name)$(log_no_color) %s$(log_no_color)\n"
 
 SRC_FILES = $(shell find src -name "*.js")
 EXM_FILES = $(shell find example -type f  | grep -v example/dist | grep -v example/.frame_cache)
+TYP_FILES = $(shell find src/types -name "*.js.flow")
 
 .PHONY: list
 list:
@@ -73,7 +74,7 @@ check:
 	@$m "Typechecking..."
 	@$(FLOW) check
 
-types: dist/types/frame.js.flow dist/types/frame-server.js.flow dist/types/react-head.js.flow
+types: $(patsubst src/types/%.js.flow,dist/types/%.js.flow,$(TYP_FILES))
 
 dist/types/%.js.flow: src/types/%.js.flow
 	@mkdir -p dist/types
