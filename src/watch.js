@@ -123,7 +123,7 @@ function config (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoin
 					},
 				},
 			}, {
-				test: /\.(png|jpe?g|woff|ttf|eot)$/,
+				test: /\.(png|jpe?g|woff|ttf|eot|pdf)$/,
 				use: [{ loader: "file-loader" }],
 			}],
 		},
