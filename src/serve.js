@@ -2,10 +2,9 @@ import express, { type $Request, type $Response, type NextFunction } from "expre
 
 import { Timer } from "./timer"
 import { type Compilation } from "./compilation"
+import { listen } from "./listen"
 
 export function serve (ctx : Compilation) {
-	const port = ctx.config.port || 8080
-
 	const app = express()
 	app.use(function (req : $Request, res : $Response, next : NextFunction) {
 		/* eslint-disable callback-return */
@@ -15,7 +14,5 @@ export function serve (ctx : Compilation) {
 	})
 	app.use(express.static(ctx.outputdir))
 
-	app.listen(port)
-
-	ctx.log("Listening on %s", `http://localhost:${port}`)
+	listen(ctx, app)
 }

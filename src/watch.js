@@ -15,6 +15,7 @@ import { type Entrypoints } from "./entrypoints"
 import { type Script } from "./client"
 import * as pcss from "./postcss"
 import { full } from "./compress/dictionary"
+import { listen } from "./listen"
 
 interface Emitter {
 	on ("build", (BuildAssets => void) | (BuildAssets => Promise<void>)) : void,
@@ -37,7 +38,7 @@ export function watch (ctx : Compilation, manifest : Manifest, entrypoints : Ent
 		publicPath: cfg.output?.publicPath,
 	}))
 	app.use(express.static(ctx.outputdir))
-	app.listen(ctx.config.port || 8080)
+	listen(ctx, app)
 
 	ctx.log("Server listening on %s", "http://localhost:8080")
 
