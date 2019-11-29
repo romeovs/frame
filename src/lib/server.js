@@ -11,6 +11,7 @@ import { context } from "./use-frame"
 export { useFrame } from "./use-frame"
 export { default as Picture } from "./picture"
 export { srcSet } from "./srcset"
+export { slug } from "./slug"
 
 export type {
 	Asset,

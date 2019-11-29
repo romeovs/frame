@@ -123,4 +123,5 @@ declare module "frame/server" {
 
 	declare export function asset(path : string) : Promise<Asset>
 	declare export function Route<T> (url : string, component : Component<T>, props : T) : RouteDef<T>
+	declare export function slug(s : string) : string
 }

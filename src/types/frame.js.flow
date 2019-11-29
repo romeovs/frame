@@ -68,4 +68,5 @@ declare module "frame" {
 
 	declare export type ImageFormat = "jpeg" | "webp" | "png" | "tiff" | "gif"
 	declare export type Asset = ImageAsset | JSONAsset | YAMLAsset | MarkdownAsset
+	declare export function slug(s : string) : string
 }

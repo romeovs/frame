@@ -12,6 +12,7 @@ export { useFrame } from "./use-frame"
 export { default as Picture } from "./picture"
 export { srcSet } from "./srcset"
 export { Link, Meta, Style, Title } from "./head"
+export { slug } from "./slug"
 
 import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
 import { type ImageFormat } from "../config"
