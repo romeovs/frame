@@ -114,7 +114,6 @@ function config (ctx : Compilation, manifest : Manifest, modern : boolean, js : 
 					/* eslint-disable global-require */
 					"node_modules/react/index.js": Object.keys(require("react")),
 					"node_modules/react-dom/index.js": Object.keys(require("react-dom")),
-					"node_modules/react-head/dist/index.esm.js": Object.keys(require("react-head")),
 				},
 				sourceMap: !ctx.config.dev,
 			}),
