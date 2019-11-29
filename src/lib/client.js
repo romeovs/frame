@@ -4,9 +4,9 @@ import { HeadProvider } from "react-head"
 
 import { decompress } from "../compress"
 import { mapkv } from "../map"
-import { context } from "./shared"
+import { context } from "./use-frame"
 
-export { useFrame } from "./shared"
+export { useFrame } from "./use-frame"
 export { default as Picture } from "./picture"
 export { srcSet } from "./srcset"
 

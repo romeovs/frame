@@ -5,8 +5,8 @@ import { type RouteDef, type Component, type Routes } from "../config"
 import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
 import { type ImageFormat } from "../config"
 
-import { context } from "./shared"
-export { useFrame } from "./shared"
+import { context } from "./use-frame"
+export { useFrame } from "./use-frame"
 export { default as Picture } from "./picture"
 export { srcSet } from "./srcset"
 
