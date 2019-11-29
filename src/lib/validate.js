@@ -103,7 +103,7 @@ export function maybe<T> (validator : (string, any) => T) : (string, any) => ?T 
 }
 
 export function imageFormat (ctx : string, x : any) : ImageFormat {
-	if (x !== "png" && x !== "jpeg" && x !== "tiff" && x !== "gif") {
+	if (x !== "webp" && x !== "png" && x !== "jpeg" && x !== "tiff" && x !== "gif") {
 		throw err(ctx, x, "expected a valid image format")
 	}
 	return x
