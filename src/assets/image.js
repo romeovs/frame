@@ -18,7 +18,7 @@ export type ImageAsset = {
 	formats : ImageFormat[],
 	matrix : string[],
 	color : ?string,
-	gradient : ?string[],
+	gradient : ?string,
 }
 
 type Metadata = {

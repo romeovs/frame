@@ -1,0 +1,32 @@
+/* eslint-disable flowtype/no-weak-types */
+
+declare module "frame/validate" {
+	import type { Asset, YAMLAsset, ImageAsset, MarkdownAsset, JSONAsset, ImageFormat } from "frame"
+
+	declare export type Validate<T> = (ctx : string, x : any) => T
+	declare export var string : Validate<string>
+	declare export var number : Validate<number>
+	declare export var object : Validate<{ ... }>
+	declare export var array : Validate<any[]>
+	declare export var imageFormat : Validate<ImageFormat>
+
+	declare export function value<T> (v : T) : Validate<T>
+	declare export function maybe<T> (v : Validate<T>) : Validate<?T>
+	declare export function arrayOf<T> (v : Validate<T>) : Validate<T[]>
+
+	declare type ExtractReturnType = <T>(any => T) => T
+	declare export function shape<Obj : {[key : string] : Function, ... }> (getters : Obj) : Validate<$ObjMap<Obj, ExtractReturnType>>
+	declare export function tuple<Arr : Function[]> (...getters : Arr) : Validate<$TupleMap<Arr, ExtractReturnType>>
+
+	declare export type ValidateAsset<T> = (ctx : string, x : Asset) => T
+	declare export var yaml : ValidateAsset<YAMLAsset>
+	declare export var json : ValidateAsset<JSONAsset>
+	declare export var image : ValidateAsset<ImageAsset>
+	declare export var markdown : ValidateAsset<MarkdownAsset>
+
+	declare export function yamlOf<T> (v : Validate<T>) : ValidateAsset<T>
+	declare export function jsonOf<T> (v : Validate<T>) : ValidateAsset<T>
+
+	declare export type typeOf<T : Validator<X>> = X
+	declare export function readAs<T> (v : ValidateAsset<T>, ...segments : string[]) : Promise<T>
+}

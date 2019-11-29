@@ -96,4 +96,13 @@ export default [
 			sourcemap: true,
 		},
 	},
+	{
+		...base,
+		input: path.resolve("src/lib/validate.js"),
+		output: {
+			file: path.resolve("dist/lib/validate.js"),
+			format: "esm",
+			sourcemap: true,
+		},
+	},
 ]

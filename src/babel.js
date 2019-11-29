@@ -59,6 +59,7 @@ export function config (ctx : Compilation, server : boolean, modern : boolean, p
 					alias: {
 						"frame/server": path.resolve(__dirname, "lib/server"),
 						"frame/head": path.resolve(__dirname, "lib/head"),
+						"frame/validate": path.resolve(__dirname, "lib/validate"),
 						"frame":
 							server
 								? path.resolve(__dirname, "lib/server")
