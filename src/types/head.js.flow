@@ -1,0 +1,33 @@
+import { type Node } from "react"
+
+declare module "frame/head" {
+
+	declare type LinkProps = {
+		rel : string,
+		href : string,
+		...,
+	}
+
+	declare function Link (props : LinkProps) : Node
+
+	declare type MetaProps = {
+		name : string,
+		content : string,
+		...,
+	}
+
+	declare function Meta (props : MetaProps) : Node
+
+	declare type StyleProps = {
+		children : string,
+	}
+
+	declare function Style (props : StyleProps) : Node
+
+
+	declare type TitleProps = {
+		children : React.Node,
+	}
+
+	declare function Title (props : TitleProps) : Node
+}
