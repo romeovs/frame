@@ -8,7 +8,11 @@ const extensions = [ ".js" ]
 export function babel (ctx : Compilation, server : boolean, modern : boolean, plugins : mixed[] = []) : babelPlugin {
 	return babelPlugin({
 		babelrc: false,
-		exclude: "node_modules/**",
+		include: [
+			`${__dirname}/**`,
+			`${ctx.config.root}/**`,
+			`${ctx.cachedir}/**`,
+		],
 		extensions,
 		...config(ctx, server, modern, plugins),
 	})
