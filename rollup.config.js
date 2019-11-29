@@ -16,7 +16,7 @@ const peers = Object.keys(pkg.peerDependencies || {})
 
 const base = {
 	treeshake: true,
-	external: [ ...deps, ...peers, "react-dom/server" ],
+	external: [ ...deps, ...peers, "react-dom/server", "frame/head" ],
 	plugins: [
 		resolve({
 			extensions,
@@ -83,6 +83,15 @@ export default [
 		input: path.resolve("src/lib/server.js"),
 		output: {
 			file: path.resolve("dist/lib/server.js"),
+			format: "esm",
+			sourcemap: true,
+		},
+	},
+	{
+		...base,
+		input: path.resolve("src/lib/head.js"),
+		output: {
+			file: path.resolve("dist/lib/head.js"),
 			format: "esm",
 			sourcemap: true,
 		},

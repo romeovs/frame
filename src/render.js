@@ -5,6 +5,7 @@ import { HTML } from "./html"
 import { purge } from "./purge-css"
 import { minify } from "./min-html"
 import { props } from "./props"
+import { RenderServer } from "./lib/head"
 
 import { type Compilation } from "./compilation"
 import { type Manifest } from "./manifest"
@@ -34,18 +35,15 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 	}
 
 	let body = ""
-	let head = []
+	let head = null
 	if (server) {
 		/* eslint-disable global-require, no-extra-parens */
 		// $ExpectError: Flow cannot handle dynamic imports
-		const [ Component, head_ ] = (require(server) : [ React.Component<T>, React.Node[] ])
+		const [ Component, head_ ] = (require(server)() : [ React.Component<T>, React.Node[] ])
 
 		body = DOM.renderToString(<Component {...route.props} />)
-		head = head_.map(tag => (
-			<React.Fragment key={Math.random()}>
-				{tag}
-			</React.Fragment>
-		))
+
+		head = <RenderServer tags={head_} />
 	}
 
 	const pcss =

@@ -54,6 +54,7 @@ export function config (ctx : Compilation, server : boolean, modern : boolean, p
 					extensions,
 					alias: {
 						"frame/server": path.resolve(__dirname, "lib/server"),
+						"frame/head": path.resolve(__dirname, "lib/head"),
 						"frame":
 							server
 								? path.resolve(__dirname, "lib/server")

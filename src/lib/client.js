@@ -1,14 +1,17 @@
 import * as React from "react"
 import DOM from "react-dom"
-import { HeadProvider } from "react-head"
+
 
 import { decompress } from "../compress"
 import { mapkv } from "../map"
+
+import { HeadProvider } from "frame/head"
 import { context } from "./use-frame"
 
 export { useFrame } from "./use-frame"
 export { default as Picture } from "./picture"
 export { srcSet } from "./srcset"
+export { Link, Meta, Style, Title } from "./head"
 
 import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
 import { type ImageFormat } from "../config"
@@ -21,7 +24,6 @@ export type {
 	MarkdownAsset,
 	ImageFormat,
 }
-
 
 const dictionary = global.DICTIONARY || []
 
