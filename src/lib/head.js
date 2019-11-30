@@ -91,7 +91,11 @@ function RenderClient (props : RenderProps) : React.Node {
 
 		const count = parseInt(meta.attributes.value.value, 10)
 		for (let i = 0; i < count; i++) {
-			meta.nextSibling.remove()
+			try {
+				meta.nextSibling.remove()
+			} catch (err) {
+				continue
+			}
 		}
 	}, [])
 
@@ -234,7 +238,9 @@ export function Meta (props : MetaProps) : React.Node {
 }
 
 export function Style (props : StyleProps) : React.Node {
-	return <HeadTag name="style" props={props} />
+	const { children } = props
+	const p = { dangerouslySetInnerHTML: { __html: children }}
+	return <HeadTag name="style" props={p} />
 }
 
 export function Title (props : TitleProps) : React.Node {
