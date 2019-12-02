@@ -115,7 +115,11 @@ function config (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoin
 				}],
 			}, {
 				test: /\.js$/,
-				exclude: /node_modules/,
+				include: [
+					new RegExp(__dirname),
+					new RegExp(ctx.config.root),
+					new RegExp(ctx.cachedir),
+				],
 				use: {
 					loader: "babel-loader",
 					options: {
