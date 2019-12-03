@@ -60,6 +60,7 @@ export function config (ctx : Compilation, server : boolean, modern : boolean, p
 						"frame/server": path.resolve(__dirname, "lib/server"),
 						"frame/head": path.resolve(__dirname, "lib/head"),
 						"frame/validate": path.resolve(__dirname, "lib/validate"),
+						"frame/hooks": path.resolve(__dirname, "lib/hooks"),
 						"frame":
 							server
 								? path.resolve(__dirname, "lib/server")

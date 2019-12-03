@@ -105,4 +105,13 @@ export default [
 			sourcemap: true,
 		},
 	},
+	{
+		...base,
+		input: path.resolve("src/lib/hooks/index.js"),
+		output: {
+			file: path.resolve("dist/lib/hooks.js"),
+			format: "esm",
+			sourcemap: true,
+		},
+	},
 ]
