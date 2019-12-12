@@ -46,6 +46,8 @@ export function plugins (ctx : Compilation) : mixed[] {
 				"**/*.woff",
 				"**/*.eot",
 				"**/*.pdf",
+				"**/*.mp4",
+				"**/*.webm",
 			],
 			publicPath: `/${jspath}/`,
 		}),

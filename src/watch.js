@@ -128,7 +128,7 @@ function config (ctx : Compilation, manifest : Manifest, entrypoints : Entrypoin
 					},
 				},
 			}, {
-				test: /\.(png|jpe?g|woff|ttf|eot|pdf)$/,
+				test: /\.(png|jpe?g|woff|ttf|eot|pdf|mp4|webm)$/,
 				use: [{ loader: "file-loader" }],
 			}],
 		},
