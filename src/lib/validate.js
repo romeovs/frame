@@ -38,6 +38,13 @@ export function number (ctx : string, x : any) : number {
 	return x
 }
 
+export function boolean (ctx : string, x : any) : boolean {
+	if (typeof x !== "boolean") {
+		throw err(ctx, x, "expected a boolean")
+	}
+	return x
+}
+
 export function object (ctx : string, x : any) : { ... } {
 	if (typeof x !== "object" || !x) {
 		throw err(ctx, x, "expected an object")

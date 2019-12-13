@@ -6,6 +6,7 @@ declare module "frame/validate" {
 	declare export type Validate<T> = (ctx : string, x : any) => T
 	declare export var string : Validate<string>
 	declare export var number : Validate<number>
+	declare export var boolean : Validate<boolean>
 	declare export var object : Validate<{ ... }>
 	declare export var array : Validate<any[]>
 	declare export var imageFormat : Validate<ImageFormat>
