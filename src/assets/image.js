@@ -87,7 +87,7 @@ async function imsrc (ctx : Compilation, manifest : FrameDefinition, meta : Meta
 	const pfx = await prefix(filename)
 	const existing = await exists(ctx, pfx, width, format)
 	if (existing) {
-		ctx.log("Skipping existing image %s", existing)
+		ctx.debug("Skipping existing image %s", existing)
 		return existing
 	}
 
