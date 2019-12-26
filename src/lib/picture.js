@@ -12,9 +12,6 @@ type Props = {
 	// The sizes prop to pass to the source and img tags
 	sizes : string,
 
-	// What direction to pick the srcSet in
-	dimension? : "w" | "h",
-
 	// The format to use for the fallback img
 	fallbackFormat? : ImageFormat,
 
@@ -25,7 +22,6 @@ function Picture (props : Props) : React.Node {
 	const {
 		image,
 		sizes,
-		dimension = "w",
 		fallbackFormat = "jpeg",
 		...rest
 	} = props
@@ -39,7 +35,7 @@ function Picture (props : Props) : React.Node {
 		)
 	}
 
-	const fallback = srcSet[dimension](image, fallbackFormat)
+	const fallback = srcSet(image, fallbackFormat)
 	const sources =
 		image.formats
 			.filter(t => t !== fallbackFormat)
@@ -48,7 +44,7 @@ function Picture (props : Props) : React.Node {
 					key={format}
 					type={`image/${format}`}
 					sizes={sizes}
-					srcSet={srcSet[dimension](image, format).srcSet}
+					srcSet={srcSet(image, format).srcSet}
 				/>
 			))
 

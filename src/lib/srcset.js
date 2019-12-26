@@ -8,20 +8,23 @@ type ImageInfo = {
 	format : ImageFormat,
 }
 
-type Orientation = {
-	bySize : (a : ImageInfo, b : ImageInfo) => number,
-	toSrc : ImageInfo => string,
-}
-
 type SrcSet = {
 	src : string,
 	srcSet : string,
 }
 
+function byWidth (a : ImageInfo, b : ImageInfo) : number {
+	return Math.sign(a.width - b.width)
+}
+
+function toSrc (a : ImageInfo) : string {
+	return `${a.url} ${a.width}w`
+}
+
 /**
  * srcSet gets a minimal srcSet from the image.
  */
-const mkSrcSet = (orientation : Orientation) => function srcSet (image : ImageAsset, format : ?ImageFormat) : SrcSet {
+export function srcSet (image : ImageAsset, format : ?ImageFormat) : SrcSet {
 	const infos : ImageInfo[] = []
 	for (const url of image.matrix) {
 		const i = info(image, url)
@@ -29,7 +32,7 @@ const mkSrcSet = (orientation : Orientation) => function srcSet (image : ImageAs
 			infos.push(i)
 		}
 	}
-	infos.sort(orientation.bySize)
+	infos.sort(byWidth)
 
 	const srces =
 		format
@@ -38,7 +41,7 @@ const mkSrcSet = (orientation : Orientation) => function srcSet (image : ImageAs
 
 	return {
 		src: srces[srces.length - 1]?.url,
-		srcSet: srces.map(orientation.toSrc).join(", "),
+		srcSet: srces.map(toSrc).join(", "),
 	}
 }
 
@@ -66,30 +69,4 @@ function info (image : ImageAsset, url : string) : ?ImageInfo {
 		width,
 		height: Math.ceil(width / image.width * image.height),
 	}
-}
-
-type SrcSetter = (ImageAsset, ?ImageFormat) => SrcSet
-
-type SrcSetters = {
-	w : SrcSetter,
-	h : SrcSetter,
-}
-
-export const srcSet : SrcSetters = {
-	w: mkSrcSet({
-		bySize (a : ImageInfo, b : ImageInfo) : number {
-			return Math.sign(a.width - b.width)
-		},
-		toSrc (inf : ImageInfo) : string {
-			return `${inf.url} ${inf.width}w`
-		},
-	}),
-	h: mkSrcSet({
-		bySize (a : ImageInfo, b : ImageInfo) : number {
-			return Math.sign(a.height - b.height)
-		},
-		toSrc (inf : ImageInfo) : string {
-			return `${inf.url} ${inf.height}h`
-		},
-	}),
 }
