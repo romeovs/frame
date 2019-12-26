@@ -64,7 +64,7 @@ function info (image : ImageAsset, url : string) : ?ImageInfo {
 		// $ExpectError: We want to avoid including validation on ImageFormat here.
 		format: m[2],
 		width,
-		height: width / image.width * image.height,
+		height: Math.ceil(width / image.width * image.height),
 	}
 }
 
