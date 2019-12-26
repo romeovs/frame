@@ -6,6 +6,7 @@ import { server } from "./server"
 import { entrypoints } from "./entrypoints"
 import { render } from "./render"
 import { system } from "./system"
+import { robots } from "./robots"
 import { type Compilation } from "./compilation"
 
 export async function build (ctx : Compilation) {
@@ -27,6 +28,8 @@ export async function build (ctx : Compilation) {
 		server: srv,
 		system: await sys,
 	})
+
+	await robots(ctx)
 
 	ctx.log("Done! (%s)", timer)
 }
