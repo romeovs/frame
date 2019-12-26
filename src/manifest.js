@@ -31,6 +31,9 @@ export type Manifest = {
 
 	// The browsers to build for
 	browsers : string[],
+
+	// Hostname is the hostname (and protocol)
+	hostname : string,
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {

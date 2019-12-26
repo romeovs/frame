@@ -9,7 +9,7 @@ export async function sitemap (ctx : Compilation, manifest : Manifest) : Promise
 
 	const urls = manifest.routes.map(route => (
 		<url key={route.id}>
-			<loc>{route.url}</loc>
+			<loc>{manifest.hostname}{route.url}</loc>
 			<lastmod>{now}</lastmod>
 		</url>
 	))
@@ -23,5 +23,5 @@ export async function sitemap (ctx : Compilation, manifest : Manifest) : Promise
 	const content = DOM.renderToStaticMarkup(component)
 	const xml = `<?xml version="1.0" encoding="UTF-8"?>${content}`
 
-	return await ctx.write("/_/sitemap.xml", xml, true)
+	return ctx.write("/_/sitemap.xml", xml, true)
 }

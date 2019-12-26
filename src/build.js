@@ -22,7 +22,7 @@ export async function build (ctx : Compilation) {
 		client(ctx, m, e, true),
 		ctx.config.dev ? [] : client(ctx, m, e, false),
 		server(ctx, m, e),
-		await robots(ctx, map),
+		await robots(ctx, m, map),
 	])
 
 	await render(ctx, m, {
