@@ -47,8 +47,8 @@ function Picture (props : Props) : React.Node {
 				<source
 					key={format}
 					type={`image/${format}`}
-					{...srcSet[dimension](image, format)}
 					sizes={sizes}
+					srcSet={srcSet[dimension](image, format).srcSet}
 				/>
 			))
 
