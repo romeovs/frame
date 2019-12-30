@@ -79,10 +79,13 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		root: pth,
 		dictionary: cfg.dictionary || defaults.dictionary,
 		globals,
-		routes: routes.map(route => ({
-			...route,
-			id: hash(path.resolve(ctx.config.root, route.import)),
-		})),
+		routes:
+			routes
+				.filter(route => Boolean(route))
+				.map(route => ({
+					...route,
+					id: hash(path.resolve(ctx.config.root, route.import)),
+				})),
 		assets: Array.from(assets),
 		globs: Array.from(globs),
 		browsers: cfg.browsers || [ "> 2%" ],

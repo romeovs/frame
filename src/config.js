@@ -44,7 +44,7 @@ export type FrameDefinition = {
 	images? : ImageConfig,
 
 	// The routes of the site, with their respective props
-	routes : () => Promise<RouteDef<*>[]>,
+	routes : () => Promise<(RouteDef<*> | null)[]>,
 
 	// Globals shared between js and css
 	globals? : () => Promise<Globals>,
