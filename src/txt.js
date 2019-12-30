@@ -14,3 +14,13 @@ export async function robots (ctx : Compilation, manifest : Manifest, sitemap : 
 		// noop
 	}
 }
+
+export async function humans (ctx : Compilation) {
+	try {
+		const txt = path.resolve(ctx.config.root, "humans.txt")
+		const content = await fs.readFile(txt, "utf-8")
+		await ctx.write("humans.txt", content)
+	} catch {
+		// noop
+	}
+}

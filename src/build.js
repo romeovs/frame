@@ -6,7 +6,7 @@ import { server } from "./server"
 import { entrypoints } from "./entrypoints"
 import { render } from "./render"
 import { system } from "./system"
-import { robots } from "./robots"
+import { robots, humans } from "./txt"
 import { sitemap } from "./sitemap"
 import { type Compilation } from "./compilation"
 
@@ -23,6 +23,7 @@ export async function build (ctx : Compilation) {
 		ctx.config.dev ? [] : client(ctx, m, e, false),
 		server(ctx, m, e),
 		await robots(ctx, m, map),
+		await humans(ctx),
 	])
 
 	await render(ctx, m, {
