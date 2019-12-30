@@ -21,6 +21,10 @@ export default {
 	dictionary: [
 		"title",
 	],
+	hostname: "https://www.example.com",
+	security: {
+		contact: "https://www.example.com/ok",
+	},
 	async routes () : Promise<Routes> {
 		const bars =
 			glob("bar/*.yml")
