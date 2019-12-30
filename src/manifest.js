@@ -5,6 +5,7 @@ import { type Compilation } from "./compilation"
 import { load, type ImageConfig, type RouteDef, type FrameDefinition, type Globals } from "./config"
 import { hash } from "./hash"
 import { asset, type Asset } from "./assets"
+import { type Security } from "./txt"
 import * as defaults from "./defaults"
 
 export type Manifest = {
@@ -34,6 +35,9 @@ export type Manifest = {
 
 	// Hostname is the hostname (and protocol)
 	hostname : string,
+
+	// Security definition for security.txt
+	security? : Security,
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {

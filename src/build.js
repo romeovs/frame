@@ -6,7 +6,7 @@ import { server } from "./server"
 import { entrypoints } from "./entrypoints"
 import { render } from "./render"
 import { system } from "./system"
-import { robots, humans } from "./txt"
+import { robots, humans, security } from "./txt"
 import { sitemap } from "./sitemap"
 import { type Compilation } from "./compilation"
 
@@ -24,6 +24,7 @@ export async function build (ctx : Compilation) {
 		server(ctx, m, e),
 		await robots(ctx, m, map),
 		await humans(ctx),
+		await security(ctx, m),
 	])
 
 	await render(ctx, m, {
