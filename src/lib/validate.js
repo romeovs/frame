@@ -1,7 +1,7 @@
 /* eslint-disable flowtype/no-weak-types */
 import path from "path"
 
-import { type Asset, type YAMLAsset, type ImageAsset, type MarkdownAsset, type JSONAsset } from "../assets"
+import { type Asset, type YAMLAsset, type ImageAsset, type MarkdownAsset, type JSONAsset, type TextAsset, type HTMLAsset } from "../assets"
 import { type ImageFormat } from "../config"
 import { asset } from "./server"
 
@@ -125,6 +125,18 @@ export const image : ValidateAsset<ImageAsset> = shape({
 	color: maybe(string),
 	gradient: maybe(string),
 	formats: arrayOf(imageFormat),
+})
+
+export const text : ValidateAsset<TextAsset> = shape({
+	id: string,
+	type: value("text"),
+	content: string,
+})
+
+export const html : ValidateAsset<HTMLAsset> = shape({
+	id: string,
+	type: value("html"),
+	content: string,
 })
 
 export function yaml (ctx : string, x : Asset) : YAMLAsset {
