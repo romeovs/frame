@@ -57,11 +57,11 @@ export function config (ctx : Compilation, server : boolean, modern : boolean, p
 				{
 					extensions,
 					alias: {
-						"frame/server": path.resolve(__dirname, "lib/server"),
-						"frame/head": path.resolve(__dirname, "lib/head"),
-						"frame/validate": path.resolve(__dirname, "lib/validate"),
-						"frame/hooks": path.resolve(__dirname, "lib/hooks"),
-						"frame":
+						"@romeovs/frame/server": path.resolve(__dirname, "lib/server"),
+						"@romeovs/frame/head": path.resolve(__dirname, "lib/head"),
+						"@romeovs/frame/validate": path.resolve(__dirname, "lib/validate"),
+						"@romeovs/frame/hooks": path.resolve(__dirname, "lib/hooks"),
+						"@romeovs/frame":
 							server
 								? path.resolve(__dirname, "lib/server")
 								: path.resolve(__dirname, "lib/client"),

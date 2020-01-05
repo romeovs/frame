@@ -1,6 +1,6 @@
 import * as React from "react"
 import path from "path"
-import { Route, glob, asset, type Routes, type RouteDef } from "frame/server"
+import { Route, glob, asset, type Routes, type RouteDef } from "@romeovs/frame/server"
 
 import { type BarProps } from "./components/bar"
 

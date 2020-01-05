@@ -1,6 +1,6 @@
 import { type Node } from "react"
 
-declare module "frame/head" {
+declare module "@romeovs/frame/head" {
 
 	declare type LinkProps = {
 		rel : string,

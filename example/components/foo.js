@@ -1,7 +1,7 @@
 import * as React from "react"
 import styles from "./foo.css"
 
-import { Title, Link, Meta } from "frame/head"
+import { Title, Link, Meta } from "@romeovs/frame/head"
 
 export type FooProps = {
 	init : number,

@@ -1,6 +1,6 @@
 {
-  "name": "frame",
-  "version": "0.0.1",
+  "name": "@romeovs/frame",
+  "version": "0.0.2",
   "license": "MIT",
   "bin": {
     "frame": "dist/cli.js"
