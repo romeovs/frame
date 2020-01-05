@@ -5,12 +5,15 @@ import nested from "postcss-nested"
 import properties from "postcss-property-lookup"
 import vars from "postcss-simple-vars"
 import url from "postcss-url"
+import forloop from "postcss-for"
+import calc from "postcss-calc"
 
 import { hash } from "./hash"
 import { type Compilation } from "./compilation"
 
 export function plugins (ctx : Compilation) : mixed {
 	return [
+		forloop(),
 		nested(),
 		properties(),
 		vars({
@@ -18,6 +21,9 @@ export function plugins (ctx : Compilation) : mixed {
 				const manifest = JSON.parse(fs.readFileSync(path.resolve(ctx.cachedir, "manifest.json"), "utf-8"))
 				return manifest.globals || {}
 			},
+		}),
+		calc({
+			mediaQueries: true,
 		}),
 		url({
 			url (asset, dir) {
