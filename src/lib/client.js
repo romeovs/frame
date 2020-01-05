@@ -5,7 +5,7 @@ import DOM from "react-dom"
 import { decompress } from "../compress"
 import { mapkv } from "../map"
 
-import { HeadProvider } from "frame/head"
+import { HeadProvider } from "__PACKAGE_NAME__/head"
 import { context } from "./use-frame"
 
 export { useFrame } from "./use-frame"

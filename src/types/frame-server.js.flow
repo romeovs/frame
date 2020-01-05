@@ -1,6 +1,6 @@
 import { type Node, type ComponentType } from "react"
 
-declare module "@romeovs/frame/server" {
+declare module "__PACKAGE_NAME__/server" {
 
 	declare type Context<Globals> = {
 		globals : Globals,

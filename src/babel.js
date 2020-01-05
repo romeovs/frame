@@ -2,6 +2,7 @@ import path from "path"
 import babelPlugin from "rollup-plugin-babel"
 
 import { type Compilation } from "./compilation"
+import { name } from "./pkg"
 
 const extensions = [ ".js" ]
 
@@ -57,11 +58,11 @@ export function config (ctx : Compilation, server : boolean, modern : boolean, p
 				{
 					extensions,
 					alias: {
-						"@romeovs/frame/server": path.resolve(__dirname, "lib/server"),
-						"@romeovs/frame/head": path.resolve(__dirname, "lib/head"),
-						"@romeovs/frame/validate": path.resolve(__dirname, "lib/validate"),
-						"@romeovs/frame/hooks": path.resolve(__dirname, "lib/hooks"),
-						"@romeovs/frame":
+						[`${name}/server`]: path.resolve(__dirname, "lib/server"),
+						[`${name}/head`]: path.resolve(__dirname, "lib/head"),
+						[`${name}/validate`]: path.resolve(__dirname, "lib/validate"),
+						[`${name}/hooks`]: path.resolve(__dirname, "lib/hooks"),
+						[name]:
 							server
 								? path.resolve(__dirname, "lib/server")
 								: path.resolve(__dirname, "lib/client"),

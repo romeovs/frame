@@ -5,7 +5,7 @@ import { type RouteDef, type Component, type Routes } from "../config"
 import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
 import { type ImageFormat } from "../config"
 
-import { HeadProvider } from "frame/head"
+import { HeadProvider } from "__PACKAGE_NAME__/head"
 import { context } from "./use-frame"
 
 export { useFrame } from "./use-frame"

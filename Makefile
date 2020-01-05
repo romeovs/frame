@@ -1,4 +1,5 @@
 NAME = frame
+PACKAGE = $(shell cat package.json | json name)
 BIN = ./node_modules/.bin
 
 ROLLUP = $(BIN)/rollup
@@ -78,4 +79,4 @@ types: $(patsubst src/types/%.js.flow,dist/types/%.js.flow,$(TYP_FILES))
 
 dist/types/%.js.flow: src/types/%.js.flow
 	@mkdir -p dist/types
-	@cp $< $@
+	@cat $< | sed 's|__PACKAGE_NAME__|$(PACKAGE)|g' > $@

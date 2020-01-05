@@ -4,6 +4,10 @@ import babel from "rollup-plugin-babel"
 import resolve from "rollup-plugin-node-resolve"
 import external from "rollup-plugin-node-externals"
 import hashbang from "rollup-plugin-hashbang"
+import replace from "@rollup/plugin-replace"
+import json from "@rollup/plugin-json"
+
+import { name } from "./src/pkg"
 
 const extensions = [
 	".js",
@@ -16,7 +20,7 @@ const peers = Object.keys(pkg.peerDependencies || {})
 
 const base = {
 	treeshake: true,
-	external: [ ...deps, ...peers, "react-dom/server", "frame/head" ],
+	external: [ ...deps, ...peers, "react-dom/server", `${name}/head` ],
 	plugins: [
 		resolve({
 			extensions,
@@ -27,6 +31,7 @@ const base = {
 			deps: true,
 			peerdeps: true,
 		}),
+		json(),
 		babel({
 			exclude: "node_modules/**",
 			extensions,
@@ -56,6 +61,9 @@ const base = {
 			],
 		}),
 		hashbang(),
+		replace({
+			"__PACKAGE_NAME__": name,
+		}),
 	],
 }
 

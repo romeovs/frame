@@ -1,7 +1,7 @@
 /* eslint-disable flowtype/no-weak-types */
 
-declare module "@romeovs/frame/validate" {
-	import type { Asset, YAMLAsset, ImageAsset, MarkdownAsset, JSONAsset, ImageFormat, TextAsset, HTMLAsset, PDFAsset } from "frame"
+declare module "__PACKAGE_NAME__/validate" {
+	import type { Asset, YAMLAsset, ImageAsset, MarkdownAsset, JSONAsset, ImageFormat, TextAsset, HTMLAsset, PDFAsset } from "__PACKAGE_NAME__"
 
 	declare export type Validate<T> = (ctx : string, x : any) => T
 	declare export var string : Validate<string>

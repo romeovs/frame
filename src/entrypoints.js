@@ -5,6 +5,7 @@ import generate from "@babel/generator"
 
 import { hash } from "./hash"
 import { Timer } from "./timer"
+import { name } from "./pkg"
 
 import { type Compilation } from "./compilation"
 import { type Manifest } from "./manifest"
@@ -37,7 +38,7 @@ async function entrypoint (ctx : Compilation, component : string) : Promise<Entr
 
 	const ast = template.program(`
 "use strict"
-import { init } from "frame"
+import { init } from "${name}"
 import Component from "FILE"
 export default init(Component)
 		`, {
