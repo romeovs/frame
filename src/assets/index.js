@@ -11,9 +11,10 @@ import { yaml, type YAMLAsset } from "./yaml"
 import { markdown, type MarkdownAsset } from "./markdown"
 import { html, type HTMLAsset } from "./html"
 import { text, type TextAsset } from "./text"
+import { pdf, type PDFAsset } from "./pdf"
 
-export type { ImageAsset, JSONAsset, YAMLAsset, MarkdownAsset, TextAsset, HTMLAsset }
-export type Asset = ImageAsset | JSONAsset | YAMLAsset | MarkdownAsset | HTMLAsset | TextAsset
+export type { ImageAsset, JSONAsset, YAMLAsset, MarkdownAsset, TextAsset, HTMLAsset, PDFAsset }
+export type Asset = ImageAsset | JSONAsset | YAMLAsset | MarkdownAsset | HTMLAsset | TextAsset | PDFAsset
 
 // The type of asset handler functions
 type Handler = (ctx : Compilation, defn : FrameDefinition, filename : string) => Promise<?Asset>
@@ -29,6 +30,7 @@ const handlers = {
 	md: markdown,
 	txt: text,
 	html,
+	pdf,
 }
 
 export async function asset (ctx : Compilation, dfn : FrameDefinition, filename : string) : Promise<?Asset> {

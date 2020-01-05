@@ -1,7 +1,7 @@
 /* eslint-disable flowtype/no-weak-types */
 import path from "path"
 
-import { type Asset, type YAMLAsset, type ImageAsset, type MarkdownAsset, type JSONAsset, type TextAsset, type HTMLAsset } from "../assets"
+import { type Asset, type YAMLAsset, type ImageAsset, type MarkdownAsset, type JSONAsset, type TextAsset, type HTMLAsset, type PDFAsset } from "../assets"
 import { type ImageFormat } from "../config"
 import { asset } from "./server"
 
@@ -137,6 +137,12 @@ export const html : ValidateAsset<HTMLAsset> = shape({
 	id: string,
 	type: value("html"),
 	content: string,
+})
+
+export const pdf : ValidateAsset<PDFAsset> = shape({
+	id: string,
+	type: value("pdf"),
+	url: string,
 })
 
 export function yaml (ctx : string, x : Asset) : YAMLAsset {
