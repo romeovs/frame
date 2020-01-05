@@ -1,7 +1,7 @@
 /* eslint-disable flowtype/no-weak-types */
 
 declare module "frame/validate" {
-	import type { Asset, YAMLAsset, ImageAsset, MarkdownAsset, JSONAsset, ImageFormat } from "frame"
+	import type { Asset, YAMLAsset, ImageAsset, MarkdownAsset, JSONAsset, ImageFormat, TextAsset, HTMLAsset, PDFAsset } from "frame"
 
 	declare export type Validate<T> = (ctx : string, x : any) => T
 	declare export var string : Validate<string>
@@ -24,10 +24,13 @@ declare module "frame/validate" {
 	declare export var json : ValidateAsset<JSONAsset>
 	declare export var image : ValidateAsset<ImageAsset>
 	declare export var markdown : ValidateAsset<MarkdownAsset>
+	declare export var text : ValidateAsset<TextAsset>
+	declare export var html : ValidateAsset<HTMLAsset>
+	declare export var pdf : ValidateAsset<PDFAsset>
 
 	declare export function yamlOf<T> (v : Validate<T>) : ValidateAsset<T>
 	declare export function jsonOf<T> (v : Validate<T>) : ValidateAsset<T>
 
-	declare export type typeOf<T : Validator<X>> = X
+	declare export type typeOf<T : Validate<X>> = X
 	declare export function readAs<T> (v : ValidateAsset<T>, ...segments : string[]) : Promise<T>
 }

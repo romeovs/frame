@@ -67,8 +67,26 @@ declare module "frame/server" {
 		content : mixed,
 	}
 
+	declare export type TextAsset = {
+		type : "text",
+		id : string,
+		content : string,
+	}
+
+	declare export type HTMLAsset = {
+		type : "html",
+		id : string,
+		content : string,
+	}
+
+	declare export type PDFAsset = {
+		type : "pdf",
+		id : string,
+		url : string,
+	}
+
 	declare export type ImageFormat = "jpeg" | "webp" | "png" | "tiff" | "gif"
-	declare export type Asset = ImageAsset | JSONAsset | YAMLAsset | MarkdownAsset
+	declare export type Asset = ImageAsset | JSONAsset | YAMLAsset | MarkdownAsset | HTMLAsset | TextAsset | PDFAsset
 
 
 	declare export type ImageConfig = {
