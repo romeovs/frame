@@ -1,0 +1,9 @@
+src/
+example/
+.trash/
+flow-typed/
+.editorconfig
+.eslintrc
+.flowconfig
+rollup.config.js
+node_modules/
