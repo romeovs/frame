@@ -6,6 +6,7 @@ import { rollup } from "rollup"
 import { babel } from "./babel"
 import { plugins } from "./shared"
 import { type Compilation } from "./compilation"
+import { type AnalyticsConfig } from "./analytics"
 
 export type ImageFormat = "jpeg" | "webp" | "png" | "tiff" | "gif"
 export type ImageConfig = {
@@ -40,6 +41,9 @@ export type Globals = $ReadOnly<{
 }>
 
 export type FrameDefinition = {
+	// The hostname of the resulting site.
+	hostname : string,
+
 	// The image config, read from the asset file
 	images? : ImageConfig,
 
@@ -54,6 +58,9 @@ export type FrameDefinition = {
 
 	// The browsers to build for
 	browsers? : string[],
+
+	// Add analytics trackers
+	analytics? : AnalyticsConfig,
 }
 
 export async function load (ctx : Compilation, filename : string) : Promise<FrameDefinition> {

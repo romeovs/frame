@@ -63,6 +63,7 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 			cssfiles={css.map(asset => asset.src)}
 			propsfile={propsfile}
 			head={head}
+			analytics={manifest.analytics}
 		/>,
 	)
 

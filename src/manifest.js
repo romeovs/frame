@@ -2,6 +2,7 @@ import path from "path"
 import glob from "glob"
 
 import { type Compilation } from "./compilation"
+import { type AnalyticsConfig } from "./analytics"
 import { load, type ImageConfig, type RouteDef, type FrameDefinition, type Globals } from "./config"
 import { hash } from "./hash"
 import { asset, type Asset } from "./assets"
@@ -38,6 +39,9 @@ export type Manifest = {
 
 	// Security definition for security.txt
 	security? : Security,
+
+	// Analytics config
+	analytics : AnalyticsConfig,
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {
@@ -89,6 +93,9 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		assets: Array.from(assets),
 		globs: Array.from(globs),
 		browsers: cfg.browsers || [ "> 2%" ],
+		analytics: cfg.analytics || {
+			fathom: undefined,
+		},
 	}
 
 	await ctx.writeCache("manifest.json", JSON.stringify(m))

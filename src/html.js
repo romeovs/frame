@@ -1,5 +1,6 @@
 import * as React from "react"
 import { type Script } from "./client"
+import { analytics } from "./analytics"
 
 
 type HTMLProps = {
@@ -11,11 +12,14 @@ type HTMLProps = {
 	head : React.Node,
 	body : string,
 	propsfile : string,
+	analytics? : {
+		fathom? : FathomConfig,
+	},
 }
 
 export function HTML (props : HTMLProps) : React.Node {
 	/* eslint-disable react/forbid-dom-props */
-	const { body, modern, legacy, system, propsfile, css, cssfiles, head } = props
+	const { body, modern, legacy, system, propsfile, css, cssfiles, head, analytics: _analytics } = props
 
 	return (
 		<html>
@@ -31,6 +35,7 @@ export function HTML (props : HTMLProps) : React.Node {
 				<div id="app" dangerouslySetInnerHTML={{ __html: body }} />
 				{cssfiles && cssfiles.map(href => <link key={href} rel="stylesheet" href={href} />)}
 				{legacy && system && <SystemJS href={legacy} />}
+				{analytics(_analytics)}
 			</body>
 		</html>
 	)

@@ -25,6 +25,12 @@ export default {
 	security: {
 		contact: "https://www.example.com/ok",
 	},
+	analytics: {
+		fathom: {
+			host: "example.com",
+			id: "1234",
+		},
+	},
 	async routes () : Promise<Routes> {
 		const bars =
 			glob("bar/*.yml")
