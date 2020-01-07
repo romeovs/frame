@@ -13,7 +13,7 @@ export type PDFAsset = {
 export async function pdf (ctx : Compilation, manifest : Manifest, filename : string) : Promise<PDFAsset> {
 	const content = await fs.readFile(filename)
 	const id = hash(filename)
-	const url = await ctx.write(id, content, true)
+	const url = await ctx.write(`${id}.pdf`, content, true)
 
 	return {
 		type: "pdf",
