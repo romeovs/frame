@@ -7,6 +7,7 @@ type HTMLProps = {
 	modern? : string,
 	legacy? : string,
 	system? : Script[],
+	lang : string,
 	css : string,
 	cssfiles : string[],
 	head : React.Node,
@@ -19,10 +20,10 @@ type HTMLProps = {
 
 export function HTML (props : HTMLProps) : React.Node {
 	/* eslint-disable react/forbid-dom-props */
-	const { body, modern, legacy, system, propsfile, css, cssfiles, head, analytics: _analytics } = props
+	const { body, modern, legacy, system, propsfile, css, cssfiles, head, analytics: _analytics, lang } = props
 
 	return (
-		<html>
+		<html lang={lang}>
 			<head>
 				<meta charSet="utf-8" />
 				{modern && <script defer type="module" src={modern} />}

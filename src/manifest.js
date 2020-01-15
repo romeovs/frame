@@ -42,6 +42,9 @@ export type Manifest = {
 
 	// Analytics config
 	analytics : AnalyticsConfig,
+
+	// HTML lang
+	lang : string,
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {
@@ -96,6 +99,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		analytics: cfg.analytics || {
 			fathom: undefined,
 		},
+		lang: cfg.lang || "en",
 	}
 
 	await ctx.writeCache("manifest.json", JSON.stringify(m))

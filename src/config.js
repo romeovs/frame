@@ -61,6 +61,9 @@ export type FrameDefinition = {
 
 	// Add analytics trackers
 	analytics? : AnalyticsConfig,
+
+	// HTML lang
+	lang? : string,
 }
 
 export async function load (ctx : Compilation, filename : string) : Promise<FrameDefinition> {

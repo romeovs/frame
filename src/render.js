@@ -64,6 +64,7 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 			propsfile={propsfile}
 			head={head}
 			analytics={manifest.analytics}
+			lang={manifest.lang}
 		/>,
 	)
 
