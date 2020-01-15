@@ -15,6 +15,10 @@ type Props = {
 	// The format to use for the fallback img
 	fallbackFormat? : ImageFormat,
 
+	alt? : string,
+
+	loading? : "auto" | "lazy" | "eager",
+
 	...,
 }
 
@@ -23,6 +27,8 @@ function Picture (props : Props) : React.Node {
 		image,
 		sizes,
 		fallbackFormat = "jpeg",
+		alt,
+		loading,
 		...rest
 	} = props
 
@@ -51,7 +57,7 @@ function Picture (props : Props) : React.Node {
 	return (
 		<picture {...rest}>
 			{sources}
-			<img {...fallback} sizes={sizes} />
+			<img {...fallback} sizes={sizes} alt={alt} loading={loading} />
 		</picture>
 	)
 }
