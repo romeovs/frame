@@ -85,7 +85,7 @@ async function page (ctx : Compilation, route : RouteDef, cache : any) : Route {
 "use strict"
 import React from "react"
 import Component from "FILE"
-const props = ${JSON.stringify(route.props)}
+const props = PROPS
 export default () => <Component {...props} />
 		`, {
 		sourceMap: true,
@@ -94,6 +94,7 @@ export default () => <Component {...props} />
 		],
 	})({
 		FILE: fname,
+		PROPS: JSON.stringify(route.props),
 	})
 
 	const gen = generate(ast)
