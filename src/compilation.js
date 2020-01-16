@@ -15,6 +15,7 @@ import { serve } from "./serve"
 import { gzip } from "./gzip"
 import { brotli } from "./brotli"
 import { type BuildAssets } from "./client"
+import { spa } from "./spa"
 
 import { build } from "./build"
 
@@ -188,7 +189,8 @@ export class Compilation {
 			m = await manifest(ctx)
 
 			// Changing the entrypoints will trigger a client build
-			e = await entrypoints(ctx, m)
+			// e = await entrypoints(ctx, m)
+			e = await spa(ctx, m)
 
 			// Add new files to be watched
 			assets.add([
