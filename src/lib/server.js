@@ -1,5 +1,5 @@
 import * as React from "react"
-
+import { StaticRouter } from "react-router-dom"
 
 import { type RouteDef, type Component, type Routes } from "../config"
 import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
@@ -42,16 +42,19 @@ export function Route<T> (url : string, component : Component<T>, props : T) : R
 	}
 }
 
-export function init<T> (C : React.ComponentType<T>) : () => [ React.ComponentType<T>, React.Node[]] {
-	return function () {
+export function init<T> (build : () => Promise<React.ComponentType<T>>) : () => Promise<[ React.ComponentType<T>, React.Node[]]> {
+	return async function () {
+		const component = await build()
 		const head = []
 
-		function Comp (props : T) : React.Node {
+		function Comp () : React.Node {
 			return (
 				<context.Provider value={global._frame_context}>
-					<HeadProvider tags={head}>
-						<C {...props} />
-					</HeadProvider>
+					<StaticRouter location={global._frame_url}>
+						<HeadProvider tags={head}>
+							{component}
+						</HeadProvider>
+					</StaticRouter>
 				</context.Provider>
 			)
 		}

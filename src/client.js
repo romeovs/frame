@@ -114,6 +114,9 @@ function config (ctx : Compilation, manifest : Manifest, modern : boolean, js : 
 					/* eslint-disable global-require */
 					"node_modules/react/index.js": Object.keys(require("react")),
 					"node_modules/react-dom/index.js": Object.keys(require("react-dom")),
+					"node_modules/react-router/index.js": Object.keys(require("react-router")),
+					"node_modules/react-router-dom/index.js": Object.keys(require("react-router-dom")),
+					"node_modules/react-is/index.js": [ "isValidElementType" ],
 				},
 				sourceMap: !ctx.config.dev,
 			}),
@@ -122,6 +125,7 @@ function config (ctx : Compilation, manifest : Manifest, modern : boolean, js : 
 				"global.DEV": JSON.stringify(ctx.config.dev),
 				"global.DICTIONARY": JSON.stringify(manifest.dictionary),
 				"global.ALPHABET": JSON.stringify(full.substring(0, manifest.dictionary.length)),
+				"global.IS_SERVER": false,
 			}),
 			babel(ctx, false, modern),
 			...plugins(ctx),
