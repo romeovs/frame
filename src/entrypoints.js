@@ -22,11 +22,7 @@ export type Entrypoints = Entrypoint[]
 export async function entrypoints (ctx : Compilation, manifest : Manifest) : Promise<Entrypoints> {
 	const timer = new Timer()
 
-	const promises = []
-	for (const route of manifest.routes) {
-		promises.push(entrypoint(ctx, route.import))
-	}
-
+	const promises = manifest.routes.map(route => entrypoint(ctx, route.import))
 	const res = await Promise.all(promises)
 	ctx.log("Built entrypoints (%s)", timer)
 

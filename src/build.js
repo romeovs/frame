@@ -8,14 +8,21 @@ import { render } from "./render"
 import { system } from "./system"
 import { robots, humans, security } from "./txt"
 import { sitemap } from "./sitemap"
+import { spa } from "./spa"
 import { type Compilation } from "./compilation"
+
+const sspa = true
 
 export async function build (ctx : Compilation) {
 	const timer = new Timer()
 	const sys = system(ctx)
 
 	const m = await manifest(ctx)
-	const e = await entrypoints(ctx, m)
+	const e =
+		sspa
+			? await spa(ctx, m)
+			: await entrypoints(ctx, m)
+
 	const map = await sitemap(ctx, m)
 
 	const [ modern, legacy, srv ] = await Promise.all([

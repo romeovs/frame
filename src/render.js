@@ -25,11 +25,13 @@ export async function render (ctx : Compilation, manifest : Manifest, assets : A
 }
 
 async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, route : RouteDef<T>) {
-	const server = assets.server.find(f => f.type === "js" && f.id === route.id)?.src
-	const modern = assets.modern.find(f => f.type === "js" && f.id === route.id)?.src
-	const legacy = assets.legacy.find(f => f.type === "js" && f.id === route.id)?.src
+	const server = assets.server.find(f => f.type === "js" && f.id === "spa")?.src
+	const modern = assets.modern.find(f => f.type === "js" && f.id === "spa")?.src
+	const legacy = assets.legacy.find(f => f.type === "js" && f.id === "spa")?.src
 	const css = stylesheets(assets.modern || assets.legacy)
 
+	global.IS_SERVER = true
+	global._frame_url = route.url
 	global._frame_context = {
 		globals: manifest.globals,
 	}
@@ -39,7 +41,7 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 	if (server) {
 		/* eslint-disable global-require, no-extra-parens */
 		// $ExpectError: Flow cannot handle dynamic imports
-		const [ Component, head_ ] = (require(server)() : [ React.Component<T>, React.Node[] ])
+		const [ Component, head_ ] = (await require(server)() : [ React.Component<T>, React.Node[] ])
 
 		body = DOM.renderToString(<Component {...route.props} />)
 
