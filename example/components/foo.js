@@ -1,6 +1,7 @@
 import * as React from "react"
 import styles from "./foo.css"
 
+import { Link as A } from "react-router-dom"
 import { Title, Link, Meta } from "@romeovs/frame/head"
 
 export type FooProps = {
@@ -25,6 +26,8 @@ export default function Foo (props : FooProps) : React.Node {
 			<div className={styles.foo}>
 				Foo: <pre>2 * {props.init} = {2 * props.init}</pre>
 			</div>
+			<A to="/">Home</A>
+			<A to="/foo">Foo</A>
 		</div>
 	)
 }
