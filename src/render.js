@@ -48,7 +48,7 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 			? css.map(asset => asset.type === "css" ? asset.content : "").join(" ")
 			: purge(ctx, body, css)
 
-	const propsfile = await props(ctx, manifest, route.props)
+	// const propsfile = await props(ctx, manifest, route.props)
 
 	const markup = DOM.renderToStaticMarkup(
 		<HTML
@@ -58,7 +58,7 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 			system={assets.system}
 			css={pcss}
 			cssfiles={css.map(asset => asset.src)}
-			propsfile={propsfile}
+			// propsfile={propsfile}
 			head={head}
 			analytics={manifest.analytics}
 			lang={manifest.lang}
