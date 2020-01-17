@@ -33,12 +33,21 @@ if (global.IS_SERVER) {
 	window.__frame_globals = GLOBALS
 }
 
+const lazy = function (fn) {
+	const Comp = React.lazy(fn)
+	return () => (
+		<React.Suspense fallback={null}>
+			<Comp />
+		</React.Suspense>
+	)
+}
+
 export default init(async function (props) {
 	${comps.map(comp => `
 	const ${comp.name} =
-		global.IS_SERVER
+		global.IS_SERVER || window.location.pathname === "${comp.url}"
 			? (await import("${comp.entrypoint}")).default
-			: React.lazy(() => import("${comp.entrypoint}"))
+			: lazy(() => import("${comp.entrypoint}"))
 	`).join("")}
 
 	return (
