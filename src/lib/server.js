@@ -48,7 +48,7 @@ export function init<T> (build : () => Promise<React.Node>) : (string) => Promis
 
 		function Comp () : React.Node {
 			return (
-				<StaticRouter location={global._frame_url}>
+				<StaticRouter location={url}>
 					<HeadProvider tags={head}>
 						{component}
 					</HeadProvider>
