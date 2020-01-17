@@ -26,13 +26,13 @@ export async function init (build : () => Promise<React.Node>) {
 	const component = await build()
 
 	const comp = (
-		<HeadProvider>
-			<BrowserRouter>
+		<BrowserRouter>
+			<HeadProvider>
 				<React.Suspense fallback={null}>
 					{component}
 				</React.Suspense>
-			</BrowserRouter>
-		</HeadProvider>
+			</HeadProvider>
+		</BrowserRouter>
 	)
 
 	const app = document.getElementById("app")
