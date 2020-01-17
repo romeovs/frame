@@ -3,7 +3,6 @@ import DOM from "react-dom"
 import { BrowserRouter } from "react-router-dom"
 
 import { HeadProvider } from "__PACKAGE_NAME__/head"
-import { context } from "./use-frame"
 
 export { useFrame } from "./use-frame"
 export { default as Picture } from "./picture"
@@ -23,19 +22,17 @@ export type {
 	ImageFormat,
 }
 
-export async function init (build : () => Promise<React.ComponentType<mixed>>) {
+export async function init (build : () => Promise<React.Node>) {
 	const component = await build()
 
 	const comp = (
-		<context.Provider value={{ globals: {}}}>
-			<HeadProvider>
-				<BrowserRouter>
-					<React.Suspense fallback={null}>
-						{component}
-					</React.Suspense>
-				</BrowserRouter>
-			</HeadProvider>
-		</context.Provider>
+		<HeadProvider>
+			<BrowserRouter>
+				<React.Suspense fallback={null}>
+					{component}
+				</React.Suspense>
+			</BrowserRouter>
+		</HeadProvider>
 	)
 
 	const app = document.getElementById("app")

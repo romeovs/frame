@@ -27,6 +27,12 @@ import React from "react"
 import { Switch, Route } from "react-router"
 import { init } from "${name}"
 
+if (global.IS_SERVER) {
+	global.__frame_globals = GLOBALS
+} else {
+	window.__frame_globals = GLOBALS
+}
+
 export default init(async function (props) {
 	${comps.map(comp => `
 	const ${comp.name} =
@@ -53,6 +59,7 @@ export default init(async function (props) {
 		],
 	})({
 		IS_SERVER: "IS_SERVER",
+		GLOBALS: JSON.stringify(manifest.globals),
 	})
 
 	const gen = generate(ast)
