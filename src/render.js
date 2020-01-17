@@ -20,9 +20,7 @@ type Assets = {
 }
 
 export async function render (ctx : Compilation, manifest : Manifest, assets : Assets) {
-	for (const route of manifest.routes) {
-		await one(ctx, manifest, assets, route)
-	}
+	await Promise.all(manifest.routes.map(route => one(ctx, manifest, assets, route)))
 }
 
 async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, route : RouteDef<T>) {
@@ -32,17 +30,13 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 	const css = stylesheets(assets.modern || assets.legacy)
 
 	global.IS_SERVER = true
-	global._frame_url = route.url
-	global._frame_context = {
-		globals: manifest.globals,
-	}
 
 	let body = ""
 	let head = null
 	if (server) {
 		/* eslint-disable global-require, no-extra-parens */
 		// $ExpectError: Flow cannot handle dynamic imports
-		const [ Component, head_ ] = (await require(server)() : [ React.Component<T>, React.Node[] ])
+		const [ Component, head_ ] = (await require(server)(route.url) : [ React.Component<T>, React.Node[] ])
 
 		body = DOM.renderToString(<Component {...route.props} />)
 
