@@ -20,8 +20,9 @@ type Assets = {
 }
 
 export async function render (ctx : Compilation, manifest : Manifest, assets : Assets) {
-	const promises = manifest.routes.map(route => one(ctx, manifest, assets, route))
-	await Promise.all(promises)
+	for (const route of manifest.routes) {
+		await one(ctx, manifest, assets, route)
+	}
 }
 
 async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, route : RouteDef<T>) {
