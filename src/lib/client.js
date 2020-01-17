@@ -28,9 +28,7 @@ export async function init (build : () => Promise<React.Node>) {
 	const comp = (
 		<BrowserRouter>
 			<HeadProvider>
-				<React.Suspense fallback={null}>
-					{component}
-				</React.Suspense>
+				{component}
 			</HeadProvider>
 		</BrowserRouter>
 	)
