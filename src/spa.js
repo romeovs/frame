@@ -45,7 +45,7 @@ const lazy = function (fn) {
 export default init(async function (props) {
 	${comps.map(comp => `
 	const ${comp.name} =
-		global.IS_SERVER || window.location.pathname === "${comp.url}"
+		global.IS_SERVER || ${JSON.stringify(comp.urls)}.includes(window.location.pathname)
 			? (await import("${comp.entrypoint}")).default
 			: lazy(() => import("${comp.entrypoint}"))
 	`).join("")}
@@ -90,6 +90,7 @@ export default init(async function (props) {
 }
 
 type Route = {
+	name : string,
 	url : string,
 	entrypoint : string,
 }
@@ -131,10 +132,22 @@ export default () => <Component {...props} />
 	}
 }
 
+type Component = {
+	name : string,
+	urls : string[],
+	entrypoint : string,
+}
+
 function dedupe (routes : Route[]) : Route[] {
 	const byName = {}
 	for (const route of routes) {
-		byName[route.name] = route
+		byName[route.name] = byName[route.name] || {
+			name: route.name,
+			urls: [],
+			entrypoint: route.entrypoint,
+		}
+
+		byName[route.name].urls.push(route.url)
 	}
 
 	const res = []
