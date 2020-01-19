@@ -46,3 +46,38 @@ export async function init (build : () => Promise<React.Node>) {
 		DOM.hydrate(comp, app)
 	}
 }
+
+type Module = {
+	default : React.ComponentType<mixed>,
+}
+
+async function getprops (propsfile : string) : Promise<mixed> {
+	const resp = await fetch(propsfile)
+	return resp.json()
+}
+
+async function get (fn : () => Promise<Module>, propsfile : string) : Promise<React.ComponentType<mixed>> {
+	const [ Mod, props ] = await Promise.all([ fn(), getprops(propsfile) ])
+
+	return function ModuleWrapper (rest : mixed) : React.Node {
+		return <Mod.default {...props} {...rest} />
+	}
+}
+
+export function lazy (url : string, fn : () => Promise<Module>, propsfile : string) : Promise<React.ComponentType<mixed>> {
+	if (window.location.pathname === url) {
+		return get(fn, propsfile)
+	}
+
+	const Comp = React.lazy(async () => ({
+		default: await get(fn, propsfile),
+	}))
+
+	return Promise.resolve(function RouteEntryWrapper (rest : mixed) : React.Node {
+		return (
+			<React.Suspense fallback={null}>
+				<Comp {...rest} />
+			</React.Suspense>
+		)
+	})
+}

@@ -59,3 +59,20 @@ export function init<T> (build : () => Promise<React.Node>) : (string) => Promis
 		return [ Comp, head ]
 	}
 }
+
+type Module = {
+	default : React.ComponentType<mixed>,
+}
+
+function getprops (propsfile : string) : mixed {
+	return global.__frame_props[propsfile]
+}
+
+export async function lazy (url : string, fn : () => Promise<Module>, propsfile : string) : Promise<React.ComponentType<mixed>> {
+	const Mod = await fn()
+	const props = getprops(propsfile)
+
+	return function RouteEntryWrapper (rest : mixed) : React.Node {
+		return <Mod.default {...props} {...rest} />
+	}
+}

@@ -31,48 +31,12 @@ export async function spa (ctx : Compilation, manifest : Manifest) : Promise<Ent
 "use strict"
 import React from "react"
 import { Switch, Route } from "react-router"
-import { init } from "${name}"
+import { init, lazy } from "${name}"
 
 if (global.IS_SERVER) {
 	global.__frame_globals = GLOBALS
 } else {
 	window.__frame_globals = GLOBALS
-}
-
-async function getprops (propsfile) {
-	if (global.IS_SERVER) {
-		return global.__frame_props[propsfile]
-	}
-
-	const resp = await fetch(propsfile)
-	return resp.json()
-}
-
-const lazy = async function (url, fn, propsfile) {
-	if (global.IS_SERVER || window.location.pathname === url) {
-		const [ Mod, props ] = await Promise.all([
-			fn(),
-			getprops(propsfile),
-		])
-		return rest => <Mod.default {...props} {...rest} />
-	}
-
-	const Comp = React.lazy(async function () {
-		const [ Mod, props ] = await Promise.all([
-			fn(),
-			getprops(propsfile),
-		])
-
-		return {
-			default: rest => <Mod.default {...props} {...rest} />
-		}
-	})
-
-	return props => (
-		<React.Suspense fallback={null}>
-			<Comp {...props} />
-		</React.Suspense>
-	)
 }
 
 export default init(async function (props) {
