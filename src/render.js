@@ -4,7 +4,6 @@ import DOM from "react-dom/server"
 import { HTML } from "./html"
 import { purge } from "./purge-css"
 import { minify } from "./min-html"
-import { props } from "./props"
 import { RenderServer } from "./lib/head"
 
 import { type Compilation } from "./compilation"
@@ -48,8 +47,6 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 			? css.map(asset => asset.type === "css" ? asset.content : "").join(" ")
 			: purge(ctx, body, css)
 
-	// const propsfile = await props(ctx, manifest, route.props)
-
 	const markup = DOM.renderToStaticMarkup(
 		<HTML
 			body={body}
@@ -58,7 +55,6 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 			system={assets.system}
 			css={pcss}
 			cssfiles={css.map(asset => asset.src)}
-			// propsfile={propsfile}
 			head={head}
 			analytics={manifest.analytics}
 			lang={manifest.lang}
