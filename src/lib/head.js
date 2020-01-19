@@ -27,7 +27,7 @@ function update (tags : ?TagDefn[], id : ID, name : TagName, props : TagProps.pr
 		return tags
 	}
 
-	const idx = tags.findIndex(t => t.id === id)
+	const idx = tags.findIndex(t => t && t.id === id)
 	tags[idx === -1 ? tags.length : idx] = { id, name, props }
 	return tags
 }
@@ -38,7 +38,7 @@ function remove (tags : ?TagDefn[], id : ID) : TagDefn[] {
 		return tags
 	}
 
-	const idx = tags.findIndex(t => t.id === id)
+	const idx = tags.findIndex(t => t && t.id === id)
 	if (idx !== -1) {
 		tags[idx] = null
 	}
