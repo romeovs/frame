@@ -8,6 +8,7 @@ import { type RouteDef } from "./config"
 import { hash } from "./hash"
 import { Timer } from "./timer"
 import { name } from "./pkg"
+import { props } from "./props"
 
 import template from "@babel/template"
 import generate from "@babel/generator"
@@ -17,9 +18,14 @@ export async function spa (ctx : Compilation, manifest : Manifest) : Promise<Ent
 	const timer = new Timer()
 	const fname = path.resolve(ctx.config.root, "spa")
 
-	const cache = {}
-	const routes = await Promise.all(manifest.routes.map((route, index) => page(ctx, route, cache)))
-	const comps = dedupe(routes)
+	const routes = await Promise.all(manifest.routes.map((route, index) => page(ctx, route, index)))
+
+	const propfiles = {}
+	for (const route of routes) {
+		propfiles[route.propsfile] = route.props
+	}
+
+	global.__frame_props = propfiles
 
 	const ast = template.program(`
 "use strict"
@@ -33,22 +39,48 @@ if (global.IS_SERVER) {
 	window.__frame_globals = GLOBALS
 }
 
-const lazy = function (fn) {
-	const Comp = React.lazy(fn)
-	return () => (
+async function getprops (propsfile) {
+	if (global.IS_SERVER) {
+		return global.__frame_props[propsfile]
+	}
+
+	const resp = await fetch(propsfile)
+	return resp.json()
+}
+
+const lazy = async function (url, fn, propsfile) {
+	if (global.IS_SERVER || window.location.pathname === url) {
+		const [ Mod, props ] = await Promise.all([
+			fn(),
+			getprops(propsfile),
+		])
+		return rest => <Mod.default {...props} {...rest} />
+	}
+
+	const Comp = React.lazy(async function () {
+		const [ Mod, props ] = await Promise.all([
+			fn(),
+			getprops(propsfile),
+		])
+
+		return {
+			default: rest => <Mod.default {...props} {...rest} />
+		}
+	})
+
+	return props => (
 		<React.Suspense fallback={null}>
-			<Comp />
+			<Comp {...props} />
 		</React.Suspense>
 	)
 }
 
 export default init(async function (props) {
-	${comps.map(comp => `
-	const ${comp.name} =
-		global.IS_SERVER || ${JSON.stringify(comp.urls)}.includes(window.location.pathname)
-			? (await import("${comp.entrypoint}")).default
-			: lazy(() => import("${comp.entrypoint}"))
-	`).join("")}
+	const [ ${routes.map(route => route.name).join(", ")} ] = await Promise.all([
+	${routes.map(route => `
+		 lazy("${route.url}", () => import("${route.entrypoint}"), "${route.propsfile}")
+	`).join(",\n")}
+	])
 
 	return (
 		<Switch>
@@ -93,42 +125,19 @@ type Route = {
 	name : string,
 	url : string,
 	entrypoint : string,
+	propsfile : string,
 }
 
-async function page (ctx : Compilation, route : RouteDef, cache : any) : Route {
+async function page (ctx : Compilation, route : RouteDef, index : number) : Route {
 	const fname = path.resolve(ctx.config.root, route.import)
-
-	const ast = template.program(`
-"use strict"
-import React from "react"
-import Component from "FILE"
-const props = PROPS
-export default () => <Component {...props} />
-		`, {
-		sourceMap: true,
-		plugins: [
-			"jsx",
-		],
-	})({
-		FILE: fname,
-		PROPS: JSON.stringify(route.props),
-	})
-
-	const gen = generate(ast)
-	const id = hash(fname)
-
-	const ep = await ctx.writeCache(`client/${id}.js`, gen.code)
-	if (gen.map) {
-		await ctx.writeCache(`client/${id}.js.map`, gen.map)
-	}
-
-	const suff = cache[ep] || Object.keys(cache).length + 1
-	cache[ep] = suff
+	const propsfile = await props(ctx, route.props)
 
 	return {
-		name: `Comp${suff}`,
+		name: `Comp${index}`,
 		url: route.url,
-		entrypoint: ep,
+		entrypoint: path.resolve(ctx.config.root, route.import),
+		propsfile,
+		props: route.props,
 	}
 }
 
