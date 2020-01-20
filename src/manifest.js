@@ -45,6 +45,9 @@ export type Manifest = {
 
 	// HTML lang
 	lang : string,
+
+	// The timeout in ms before the load component is shown
+	loadTimeout : number,
 }
 
 export async function manifest (ctx : Compilation) : Promise<Manifest> {
@@ -100,6 +103,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 			fathom: undefined,
 		},
 		lang: cfg.lang || "en",
+		loadTimeout: cfg.loadTimeout || 400,
 	}
 
 	await ctx.writeCache("manifest.json", JSON.stringify(m))

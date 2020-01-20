@@ -64,6 +64,9 @@ export type FrameDefinition = {
 
 	// HTML lang
 	lang? : string,
+
+	// The timeout in ms before the load component is shown
+	loadTimeout? : number,
 }
 
 export async function load (ctx : Compilation, filename : string) : Promise<FrameDefinition> {

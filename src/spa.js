@@ -1,4 +1,5 @@
 import path from "path"
+import fs from "fs"
 
 import { type Compilation } from "./compilation"
 import { type Manifest } from "./manifest"
@@ -27,11 +28,15 @@ export async function spa (ctx : Compilation, manifest : Manifest) : Promise<Ent
 
 	global.__frame_props = propfiles
 
+	const load = path.resolve(ctx.config.root, "_loading.js")
+
 	const ast = template.program(`
 "use strict"
 import React from "react"
 import { Switch, Route } from "react-router"
 import { init, lazy } from "${name}"
+
+${fs.existsSync(load) ? `import fallback from "${load}"` : "const fallback = null"}
 
 if (global.IS_SERVER) {
 	global.__frame_globals = GLOBALS
@@ -42,7 +47,7 @@ if (global.IS_SERVER) {
 export default init(async function (props) {
 	const [ ${routes.map(route => route.name).join(", ")} ] = await Promise.all([
 	${routes.map(route => `
-		 lazy("${route.url}", () => import("${route.entrypoint}"), "${route.propsfile}")
+		 lazy("${route.url}", () => import("${route.entrypoint}"), "${route.propsfile}", fallback, ${manifest.loadTimeout})
 	`).join(",\n")}
 	])
 
@@ -55,7 +60,7 @@ export default init(async function (props) {
 			`.trim()).join("\n")}
 		</Switch>
 	)
-})
+}, fallback, ${manifest.loadTimeout})
 	`, {
 		sourceMap: true,
 		plugins: [

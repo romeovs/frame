@@ -22,15 +22,17 @@ export type {
 	ImageFormat,
 }
 
-export async function init (build : () => Promise<React.Node>) {
+export async function init (build : () => Promise<React.Node>, Fallback : ?React.ComponentType<mixed>, timeout : number) {
 	const component = await build()
 
 	const comp = (
-		<BrowserRouter>
-			<HeadProvider>
-				{component}
-			</HeadProvider>
-		</BrowserRouter>
+		<HeadProvider>
+			<React.Suspense fallback={Fallback ? <Fallback /> : null} ms={timeout}>
+				<BrowserRouter>
+					{component}
+				</BrowserRouter>
+			</React.Suspense>
+		</HeadProvider>
 	)
 
 	const app = document.getElementById("app")
@@ -51,6 +53,14 @@ type Module = {
 	default : React.ComponentType<mixed>,
 }
 
+function simple (url : string) : string {
+	if (url === "/") {
+		return url
+	}
+
+	return url.replace(/\/*$/g, "")
+}
+
 async function getprops (propsfile : string) : Promise<mixed> {
 	const resp = await fetch(propsfile)
 	return resp.json()
@@ -58,26 +68,19 @@ async function getprops (propsfile : string) : Promise<mixed> {
 
 async function get (fn : () => Promise<Module>, propsfile : string) : Promise<React.ComponentType<mixed>> {
 	const [ Mod, props ] = await Promise.all([ fn(), getprops(propsfile) ])
-
 	return function ModuleWrapper (rest : mixed) : React.Node {
 		return <Mod.default {...props} {...rest} />
 	}
 }
 
 export function lazy (url : string, fn : () => Promise<Module>, propsfile : string) : Promise<React.ComponentType<mixed>> {
-	if (window.location.pathname === url) {
+	if (simple(window.location.pathname) === url) {
 		return get(fn, propsfile)
 	}
 
-	const Comp = React.lazy(async () => ({
-		default: await get(fn, propsfile),
+	return Promise.resolve(React.lazy(async function () : Promise<Module> {
+		return {
+			default: await get(fn, propsfile),
+		}
 	}))
-
-	return Promise.resolve(function RouteEntryWrapper (rest : mixed) : React.Node {
-		return (
-			<React.Suspense fallback={null}>
-				<Comp {...rest} />
-			</React.Suspense>
-		)
-	})
 }
