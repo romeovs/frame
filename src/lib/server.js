@@ -41,18 +41,18 @@ export function Route<T> (url : string, component : Component<T>, props : T) : R
 	}
 }
 
-export function init<T> (build : () => Promise<React.Node>) : (string) => Promise<[ React.ComponentType<T>, React.Node[]]> {
+export function init<T> (build : () => Promise<React.ComponentType<null>>) : (string) => Promise<[ React.ComponentType<T>, React.Node[]]> {
 	return async function (url : string) : Promise<[ React.ComponentType<T>, React.Node[]]> {
-		const component = await build()
+		const Component = await build()
 		const head = []
 
 		function Comp () : React.Node {
 			return (
-				<StaticRouter location={url}>
-					<HeadProvider tags={head}>
-						{component}
-					</HeadProvider>
-				</StaticRouter>
+				<HeadProvider tags={head}>
+					<StaticRouter location={url}>
+						<Component />
+					</StaticRouter>
+				</HeadProvider>
 			)
 		}
 
@@ -64,7 +64,7 @@ type Module = {
 	default : React.ComponentType<mixed>,
 }
 
-function getprops (propsfile : string) : mixed {
+export function getprops (propsfile : string) : mixed {
 	return global.__frame_props[propsfile]
 }
 
