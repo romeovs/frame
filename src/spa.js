@@ -39,6 +39,14 @@ export async function spa (ctx : Compilation, manifest : Manifest) : Promise<Ent
 		}
 	}
 
+	const rts = {}
+	for (const route of routes) {
+		rts[route.url] = {
+			id: route.id,
+			pf: route.propsfile,
+		}
+	}
+
 	const ast = template.program(`
 "use strict"
 import React from "react"
@@ -47,29 +55,29 @@ import { init, lazy, getprops } from "${name}"
 
 ${fs.existsSync(load) ? `import fallback from "${load}"` : "const fallback = null"}
 
+const info = ROUTES
+
 if (global.IS_SERVER) {
 	global.__frame_globals = GLOBALS
-	global.__frame_routes = ROUTES
+	global.__frame_routes = info
 } else {
 	window.__frame_globals = GLOBALS
-	window.__frame_routes = ROUTES
+	window.__frame_routes = info
 }
 
 function match (url) {
 	function m(path) {
-		return matchPath(url, { path, exact: true, strict: false })
 	}
 
-	let r
-	${routes.map(route => `
-		if (r = m("${route.url}")) {
+	for (const path in info) {
+		const m = matchPath(url, { path, exact: true, strict: false })
+		if (m) {
 			return {
-				id: "${route.id}",
-				pf: "${route.propsfile}",
-				match: r
+				...info[path],
+				match: m,
 			}
 		}
-	`).join("")}
+	}
 
 	return null
 }
@@ -113,11 +121,11 @@ export default init(async function () {
 	})({
 		IS_SERVER: "IS_SERVER",
 		GLOBALS: JSON.stringify(manifest.globals),
-		ROUTES: JSON.stringify(routes),
+		ROUTES: JSON.stringify(rts),
 	})
 
 	const gen = generate(ast)
-	// console.log(gen.code)
+	console.log(gen.code)
 
 	const ep = await ctx.writeCache(`client/spa.js`, gen.code)
 	if (gen.map) {
