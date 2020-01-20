@@ -1,5 +1,6 @@
 import * as React from "react"
 import DOM from "react-dom/server"
+import path from "path"
 
 import { HTML } from "./html"
 import { purge } from "./purge-css"
@@ -27,6 +28,9 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 	const modern = assets.modern.find(f => f.type === "js" && f.id === "spa")?.src
 	const legacy = assets.legacy.find(f => f.type === "js" && f.id === "spa")?.src
 	const css = stylesheets(assets.modern || assets.legacy)
+
+	const pth = path.resolve(ctx.config.root, route.import)
+	const modulepreload = assets.modern.find(f => f.type === "js" && f.file && f.file.startsWith(pth))?.src
 
 	global.IS_SERVER = true
 
@@ -58,6 +62,8 @@ async function one<T> (ctx : Compilation, manifest : Manifest, assets : Assets, 
 			head={head}
 			analytics={manifest.analytics}
 			lang={manifest.lang}
+			propsfile={route.propsfile}
+			modulepreload={modulepreload}
 		/>,
 	)
 

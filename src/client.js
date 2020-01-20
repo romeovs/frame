@@ -63,21 +63,33 @@ export async function client (ctx : Compilation, manifest : Manifest, entrypoint
 function marshal (ctx : Compilation, output : RollupChunk[]) : BuildAssets {
 	return (
 		output
-			.filter(asset => asset.isEntry || asset.fileName.endsWith(".css"))
+			// .filter(asset => asset.fileName.endsWith(".css") || asset.fileName.endsWith(".js"))
 			.map(function (asset : RollupChunk) : BuildAsset {
-				if (asset.fileName.endsWith(".css")) {
+				if ((asset.fileName.endsWith(".mjs") || asset.fileName.endsWith(".js")) && !asset.isEntry) {
 					return {
+						type: "js",
 						src: `/${jspath}/${asset.fileName}`,
-						content: asset.source,
-						type: "css",
+						file: asset.facadeModuleId,
 					}
 				}
-				return {
-					src: `/${jspath}/${asset.fileName}`,
-					id: path.basename(asset.facadeModuleId).replace(".js", ""),
-					type: "js",
+
+				if (asset.fileName.endsWith(".css")) {
+					return {
+						type: "css",
+						src: `/${jspath}/${asset.fileName}`,
+						content: asset.source,
+					}
+				}
+
+				if (asset.facadeModuleId) {
+					return {
+						src: `/${jspath}/${asset.fileName}`,
+						id: path.basename(asset.facadeModuleId).replace(".js", ""),
+						type: "js",
+					}
 				}
 			})
+			.filter(x => Boolean(x))
 	)
 }
 
