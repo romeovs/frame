@@ -31,6 +31,7 @@ export default {
 			id: "1234",
 		},
 	},
+	loadTimeout: 500,
 	async routes () : Promise<Routes> {
 		const bars =
 			glob("bar/*.yml")
