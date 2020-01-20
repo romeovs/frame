@@ -68,11 +68,11 @@ function getprops (propsfile : string) : mixed {
 	return global.__frame_props[propsfile]
 }
 
-export async function lazy (url : string, fn : () => Promise<Module>, propsfile : string) : Promise<React.ComponentType<mixed>> {
+export async function lazy (fn : () => Promise<Module>) : Promise<React.ComponentType<mixed>> {
 	const Mod = await fn()
-	const props = getprops(propsfile)
-
-	return function RouteEntryWrapper (rest : mixed) : React.Node {
-		return <Mod.default {...props} {...rest} />
+	return function RouteEntryWrapper (props : mixed) : React.Node {
+		const { propsfile, ...rest } = props
+		const _props = getprops(propsfile)
+		return <Mod.default {..._props} {...rest} />
 	}
 }

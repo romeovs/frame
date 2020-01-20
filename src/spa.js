@@ -30,10 +30,23 @@ export async function spa (ctx : Compilation, manifest : Manifest) : Promise<Ent
 
 	const load = path.resolve(ctx.config.root, "_loading.js")
 
+	const deduped = {}
+	for (const route of routes) {
+		deduped[route.id] = {
+			entrypoint: route.entrypoint,
+			name: `Comp${Object.keys(deduped).length + 1}`,
+			paths: [],
+		}
+	}
+
+	for (const route of routes) {
+		deduped[route.id].paths.push(route.url)
+	}
+
 	const ast = template.program(`
 "use strict"
 import React from "react"
-import { Switch, Route } from "react-router"
+import { useRouteMatch } from "react-router"
 import { init, lazy } from "${name}"
 
 ${fs.existsSync(load) ? `import fallback from "${load}"` : "const fallback = null"}
@@ -44,22 +57,28 @@ if (global.IS_SERVER) {
 	window.__frame_globals = GLOBALS
 }
 
-export default init(async function (props) {
-	const [ ${routes.map(route => route.name).join(", ")} ] = await Promise.all([
-	${routes.map(route => `
-		 lazy("${route.url}", () => import("${route.entrypoint}"), "${route.propsfile}", fallback, ${manifest.loadTimeout})
-	`).join(",\n")}
+export default init(async function () {
+	const [ ${Object.values(deduped).map(comp => comp.name).join(", ")} ] = await Promise.all([
+		${Object.values(deduped).map(comp => `
+			lazy(() => import("${comp.entrypoint}"), ${JSON.stringify(comp.paths)}),
+		`).join("")}
 	])
 
-	return (
-		<Switch>
-			${routes.map((route, index) => `
-				<Route exact path="${route.url}">
-					<${route.name} {...props} />
-				</Route>
-			`.trim()).join("\n")}
-		</Switch>
-	)
+	function Routes () {
+		${routes.map(route => `
+			const m${route.idx} = useRouteMatch("${route.url}")
+		`).join("")}
+
+		${routes.map(route => `
+			if (m${route.idx}) {
+				return <${deduped[route.id].name} propsfile="${route.propsfile}" />
+			}
+		`).join("")}
+
+		throw new Error("no route matched")
+	}
+
+	return <Routes />
 }, fallback, ${manifest.loadTimeout})
 	`, {
 		sourceMap: true,
@@ -100,13 +119,15 @@ type Route = {
 async function page (ctx : Compilation, route : RouteDef, index : number) : Route {
 	const fname = path.resolve(ctx.config.root, route.import)
 	const propsfile = await props(ctx, route.props)
+	const entrypoint = path.resolve(ctx.config.root, route.import)
 
 	return {
-		name: `Comp${index}`,
 		url: route.url,
-		entrypoint: path.resolve(ctx.config.root, route.import),
+		entrypoint,
 		propsfile,
 		props: route.props,
+		id: await hash(entrypoint),
+		idx: index,
 	}
 }
 
