@@ -33,21 +33,17 @@ export async function spa (ctx : Compilation, manifest : Manifest) : Promise<Ent
 	const deduped = {}
 	for (const route of routes) {
 		deduped[route.id] = {
+			id: route.id,
 			entrypoint: route.entrypoint,
 			name: `Comp${Object.keys(deduped).length + 1}`,
-			paths: [],
 		}
-	}
-
-	for (const route of routes) {
-		deduped[route.id].paths.push(route.url)
 	}
 
 	const ast = template.program(`
 "use strict"
 import React from "react"
 import { useRouteMatch } from "react-router"
-import { init, lazy } from "${name}"
+import { init, lazy, getprops } from "${name}"
 
 ${fs.existsSync(load) ? `import fallback from "${load}"` : "const fallback = null"}
 
@@ -57,14 +53,34 @@ if (global.IS_SERVER) {
 	window.__frame_globals = GLOBALS
 }
 
+function simple (url) {
+	if (url === "/") {
+		return url
+	}
+
+	return url.replace(/\\/*$/g, "")
+}
+
+
 export default init(async function () {
+	const routes = {
+		${routes.map(route => `
+			"${route.url}": {
+				pf: "${route.propsfile}",
+				id: "${route.id}",
+			},
+		`).join("")}
+	}
+	const curr = global.IS_SERVER ? null : routes[simple(window.location.pathname)]
 	const [ ${Object.values(deduped).map(comp => comp.name).join(", ")} ] = await Promise.all([
 		${Object.values(deduped).map(comp => `
-			lazy(() => import("${comp.entrypoint}"), ${JSON.stringify(comp.paths)}),
+			lazy(() => import("${comp.entrypoint}"), curr && "${comp.id}" === curr.id),
 		`).join("")}
+		// preload props
+		await (curr && getprops(curr.pf, true)),
 	])
 
-	function Routes () {
+	return function RoutesWrapper () {
 		${routes.map(route => `
 			const m${route.idx} = useRouteMatch("${route.url}")
 		`).join("")}
@@ -77,8 +93,6 @@ export default init(async function () {
 
 		throw new Error("no route matched")
 	}
-
-	return <Routes />
 }, fallback, ${manifest.loadTimeout})
 	`, {
 		sourceMap: true,
