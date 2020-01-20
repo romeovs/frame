@@ -61,26 +61,42 @@ function simple (url : string) : string {
 	return url.replace(/\/*$/g, "")
 }
 
-async function getprops (propsfile : string) : Promise<mixed> {
+const cache = {}
+async function _get (propsfile : string) : Promise<mixed> {
 	const resp = await fetch(propsfile)
-	return resp.json()
+	const data = await resp.json()
+	cache[propsfile] = data
+	return data
 }
 
-async function get (fn : () => Promise<Module>, propsfile : string) : Promise<React.ComponentType<mixed>> {
-	const [ Mod, props ] = await Promise.all([ fn(), getprops(propsfile) ])
-	return function ModuleWrapper (rest : mixed) : React.Node {
-		return <Mod.default {...props} {...rest} />
-	}
-}
-
-export function lazy (url : string, fn : () => Promise<Module>, propsfile : string) : Promise<React.ComponentType<mixed>> {
-	if (simple(window.location.pathname) === url) {
-		return get(fn, propsfile)
-	}
-
-	return Promise.resolve(React.lazy(async function () : Promise<Module> {
-		return {
-			default: await get(fn, propsfile),
+const promises = {}
+function getprops (propsfile : string) : mixed {
+	if (!cache[propsfile]) {
+		if (!promises[propsfile]) {
+			promises[propsfile] = _get(propsfile)
 		}
-	}))
+
+		throw promises[propsfile]
+	}
+
+	return cache[propsfile]
+}
+
+type Props = {
+	propsfile : string,
+	...,
+}
+
+export async function lazy (fn : () => Promise<Module>, paths : boolean) : Promise<React.ComponentType<Props>> {
+	const Component = React.lazy(fn)
+
+	if (paths.includes(simple(window.location.pathname))) {
+		await fn()
+	}
+
+	return function Wrapper (props : Props) : React.Node {
+		const { propsfile, ...rest } = props
+		const _props = getprops(propsfile)
+		return <Component {..._props} {...rest} />
+	}
 }
