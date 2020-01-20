@@ -42,47 +42,57 @@ export async function spa (ctx : Compilation, manifest : Manifest) : Promise<Ent
 	const ast = template.program(`
 "use strict"
 import React from "react"
-import { useRouteMatch } from "react-router"
+import { useRouteMatch, matchPath } from "react-router"
 import { init, lazy, getprops } from "${name}"
 
 ${fs.existsSync(load) ? `import fallback from "${load}"` : "const fallback = null"}
 
 if (global.IS_SERVER) {
 	global.__frame_globals = GLOBALS
+	global.__frame_routes = ROUTES
 } else {
 	window.__frame_globals = GLOBALS
+	window.__frame_routes = ROUTES
 }
 
-function simple (url) {
-	if (url === "/") {
-		return url
+function match (url) {
+	function m(path) {
+		return matchPath(url, { path, exact: true, strict: false })
 	}
 
-	return url.replace(/\\/*$/g, "")
-}
+	let r
+	${routes.map(route => `
+		if (r = m("${route.url}")) {
+			return {
+				id: "${route.id}",
+				pf: "${route.propsfile}",
+				match: r
+			}
+		}
+	`).join("")}
 
+	return null
+}
 
 export default init(async function () {
-	const routes = {
-		${routes.map(route => `
-			"${route.url}": {
-				pf: "${route.propsfile}",
-				id: "${route.id}",
-			},
-		`).join("")}
-	}
-	const curr = global.IS_SERVER ? null : routes[simple(window.location.pathname)]
+	const curr = global.IS_SERVER ? null : match(window.location.pathname)
+
 	const [ ${Object.values(deduped).map(comp => comp.name).join(", ")} ] = await Promise.all([
+		// create components and preload them
 		${Object.values(deduped).map(comp => `
 			lazy(() => import("${comp.entrypoint}"), curr && "${comp.id}" === curr.id),
 		`).join("")}
+
 		// preload props
-		await (curr && getprops(curr.pf, true)),
+		curr && await getprops(curr.pf, true),
 	])
 
 	return function RoutesWrapper () {
 		${routes.map(route => `
-			const m${route.idx} = useRouteMatch("${route.url}")
+			const m${route.idx} = useRouteMatch({
+				path: "${route.url}",
+				exact: true,
+			})
 		`).join("")}
 
 		${routes.map(route => `
@@ -103,9 +113,11 @@ export default init(async function () {
 	})({
 		IS_SERVER: "IS_SERVER",
 		GLOBALS: JSON.stringify(manifest.globals),
+		ROUTES: JSON.stringify(routes),
 	})
 
 	const gen = generate(ast)
+	// console.log(gen.code)
 
 	const ep = await ctx.writeCache(`client/spa.js`, gen.code)
 	if (gen.map) {
@@ -132,13 +144,12 @@ type Route = {
 
 async function page (ctx : Compilation, route : RouteDef, index : number) : Route {
 	const fname = path.resolve(ctx.config.root, route.import)
-	const propsfile = await props(ctx, route.props)
 	const entrypoint = path.resolve(ctx.config.root, route.import)
 
 	return {
 		url: route.url,
 		entrypoint,
-		propsfile,
+		propsfile: route.propsfile,
 		props: route.props,
 		id: await hash(entrypoint),
 		idx: index,

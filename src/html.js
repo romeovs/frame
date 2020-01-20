@@ -13,6 +13,7 @@ type HTMLProps = {
 	head : React.Node,
 	body : string,
 	propsfile : string,
+	modulepreload? : string,
 	analytics? : {
 		fathom? : FathomConfig,
 	},
@@ -20,16 +21,17 @@ type HTMLProps = {
 
 export function HTML (props : HTMLProps) : React.Node {
 	/* eslint-disable react/forbid-dom-props */
-	const { body, modern, legacy, system, propsfile, css, cssfiles, head, analytics: _analytics, lang } = props
+	const { body, modern, legacy, system, propsfile, css, cssfiles, head, analytics: _analytics, lang, modulepreload } = props
 
 	return (
 		<html lang={lang}>
 			<head>
 				<meta charSet="utf-8" />
+				{propsfile && <link href={propsfile} rel="prefetch" />}
+				{modulepreload && <link href={modulepreload} rel="modulepreload" />}
 				{modern && <script defer type="module" src={modern} />}
 				{legacy && system && system.map(asset => <script defer noModule src={asset.src} key={asset.id} />)}
 				{css && <style>{css}</style>}
-				{propsfile && <link id="frameprops" href={propsfile} rel="prefetch" />}
 				{head}
 			</head>
 			<body>

@@ -7,6 +7,7 @@ import { load, type ImageConfig, type RouteDef, type FrameDefinition, type Globa
 import { hash } from "./hash"
 import { asset, type Asset } from "./assets"
 import { type Security } from "./txt"
+import { props } from "./props"
 import * as defaults from "./defaults"
 
 export type Manifest = {
@@ -90,12 +91,15 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		dictionary: cfg.dictionary || defaults.dictionary,
 		globals,
 		routes:
-			routes
-				.filter(route => Boolean(route))
-				.map(route => ({
-					...route,
-					id: hash(path.resolve(ctx.config.root, route.import)),
-				})),
+			await Promise.all(
+				routes
+					.filter(route => Boolean(route))
+					.map(async route => ({
+						...route,
+						id: hash(path.resolve(ctx.config.root, route.import)),
+						propsfile: await props(ctx, route.props),
+					})),
+			),
 		assets: Array.from(assets),
 		globs: Array.from(globs),
 		browsers: cfg.browsers || [ "> 2%" ],
