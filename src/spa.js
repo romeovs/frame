@@ -50,8 +50,8 @@ export async function spa (ctx : Compilation, manifest : Manifest) : Promise<Ent
 	const ast = template.program(`
 "use strict"
 import React from "react"
-import { useRouteMatch, matchPath } from "react-router"
-import { init, lazy, getprops } from "${name}"
+import { useRouteMatch } from "react-router"
+import { init, lazy, getprops, match } from "${name}"
 
 ${fs.existsSync(load) ? `import fallback from "${load}"` : "const fallback = null"}
 
@@ -65,30 +65,13 @@ if (global.IS_SERVER) {
 	window.__frame_routes = info
 }
 
-function match (url) {
-	function m(path) {
-	}
-
-	for (const path in info) {
-		const m = matchPath(url, { path, exact: true, strict: false })
-		if (m) {
-			return {
-				...info[path],
-				match: m,
-			}
-		}
-	}
-
-	return null
-}
-
 export default init(async function () {
 	const curr = global.IS_SERVER ? null : match(window.location.pathname)
 
 	const [ ${Object.values(deduped).map(comp => comp.name).join(", ")} ] = await Promise.all([
 		// create components and preload them
 		${Object.values(deduped).map(comp => `
-			lazy(() => import("${comp.entrypoint}"), curr && "${comp.id}" === curr.id),
+			lazy("${comp.id}", () => import("${comp.entrypoint}"), curr && "${comp.id}" === curr.id),
 		`).join("")}
 
 		// preload props

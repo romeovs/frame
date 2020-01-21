@@ -1,13 +1,14 @@
 import * as React from "react"
 import DOM from "react-dom"
-import { BrowserRouter } from "react-router-dom"
+
+import { matchPath } from "react-router"
+import { BrowserRouter, Link as RLink } from "react-router-dom"
 
 import { HeadProvider } from "__PACKAGE_NAME__/head"
 
 export { useFrame } from "./use-frame"
 export { default as Picture } from "./picture"
 export { srcSet } from "./srcset"
-export { Link, Meta, Style, Title } from "./head"
 export { slug } from "./slug"
 
 import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
@@ -92,15 +93,73 @@ type Props = {
 	...,
 }
 
-export async function lazy (fn : () => Promise<Module>, force : boolean) : Promise<React.ComponentType<Props>> {
+const modulefetchers = {}
+
+export async function lazy (id : string, fn : () => Promise<Module>, force : boolean) : Promise<React.ComponentType<Props>> {
 	let Component = React.lazy(fn)
 	if (force) {
 		Component = (await fn()).default
 	}
+
+	modulefetchers[id] = fn
 
 	return function Wrapper (props : Props) : React.Node {
 		const { propsfile, ...rest } = props
 		const _props = getprops(propsfile, false)
 		return <Component {..._props} {...rest} />
 	}
+}
+
+type LinkProps = {
+	href : string,
+	children : React.Node,
+	onMouseEnter? : React.HTMLMouseEvent<any> => void,
+	...,
+}
+
+export function match (url : string) {
+	for (const path in window.__frame_routes) {
+		const match = matchPath(url, { path, exact: true, strict: false })
+		if (match) {
+			return {
+				...window.__frame_routes[path],
+				match,
+			}
+		}
+	}
+
+	return null
+}
+
+function preload (href : string) {
+	const m = match(href)
+	if (!m) {
+		return
+	}
+
+	fetch(m.pf)
+	if (modulefetchers[m.id]) {
+		modulefetchers[m.id]()
+	}
+}
+
+export function Link (props : LinkProps) : React.Node {
+	const { href, children, onMouseEnter, ...rest } = props
+
+	function handleEnter (evt) {
+		if (onMouseEnter) {
+			onMouseEnter(evt)
+		}
+		preload(href)
+	}
+
+	return (
+		<RLink
+			{...rest}
+			to={href}
+			onMouseEnter={handleEnter}
+		>
+			{children}
+		</RLink>
+	)
 }
