@@ -9,7 +9,6 @@ import { type RouteDef } from "./config"
 import { hash } from "./hash"
 import { Timer } from "./timer"
 import { name } from "./pkg"
-import { props } from "./props"
 
 import template from "@babel/template"
 import generate from "@babel/generator"
@@ -65,6 +64,21 @@ if (global.IS_SERVER) {
 	window.__frame_routes = info
 }
 
+function useRoute (path) {
+	const m = useRouteMatch({
+		path,
+		exact: true,
+	})
+
+	if (!m) {
+		return m
+	}
+
+	return {
+		propsfile: info[path].pf,
+	}
+}
+
 export default init(async function () {
 	const curr = global.IS_SERVER ? null : match(window.location.pathname)
 
@@ -80,15 +94,12 @@ export default init(async function () {
 
 	return function RoutesWrapper () {
 		${routes.map(route => `
-			const m${route.idx} = useRouteMatch({
-				path: "${route.url}",
-				exact: true,
-			})
+			const m${route.idx} = useRoute("${route.url}")
 		`).join("")}
 
 		${routes.map(route => `
 			if (m${route.idx}) {
-				return <${deduped[route.id].name} propsfile="${route.propsfile}" />
+				return <${deduped[route.id].name} propsfile={m${route.idx}.propsfile} />
 			}
 		`).join("")}
 
@@ -108,7 +119,6 @@ export default init(async function () {
 	})
 
 	const gen = generate(ast)
-	console.log(gen.code)
 
 	const ep = await ctx.writeCache(`client/spa.js`, gen.code)
 	if (gen.map) {
