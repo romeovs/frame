@@ -1,5 +1,5 @@
 import * as React from "react"
-import { StaticRouter } from "react-router-dom"
+import { StaticRouter, Link as RLink } from "react-router-dom"
 
 import { type RouteDef, type Component, type Routes } from "../config"
 import { type Asset, type ImageAsset, type JSONAsset, type YAMLAsset, type MarkdownAsset } from "../assets"
@@ -68,11 +68,22 @@ export function getprops (propsfile : string) : mixed {
 	return global.__frame_props[propsfile]
 }
 
-export async function lazy (fn : () => Promise<Module>) : Promise<React.ComponentType<mixed>> {
+export async function lazy (id : string, fn : () => Promise<Module>) : Promise<React.ComponentType<mixed>> {
 	const Mod = await fn()
 	return function RouteEntryWrapper (props : mixed) : React.Node {
 		const { propsfile, ...rest } = props
 		const _props = getprops(propsfile)
 		return <Mod.default {..._props} {...rest} />
 	}
+}
+
+export function match () {
+	return null
+}
+
+export function Link (props) {
+	const { href, ...rest } = props
+	return (
+		<RLink {...rest} to={href} />
+	)
 }
