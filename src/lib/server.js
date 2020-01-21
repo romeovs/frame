@@ -77,11 +77,16 @@ export async function lazy (id : string, fn : () => Promise<Module>) : Promise<R
 	}
 }
 
-export function match () {
+export function match () : null {
 	return null
 }
 
-export function Link (props) {
+type LinkProps = {
+	href : string,
+	...,
+}
+
+export function Link (props : LinkProps) : React.Node {
 	const { href, ...rest } = props
 	return (
 		<RLink {...rest} to={href} />
