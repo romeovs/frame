@@ -3,9 +3,11 @@ import { compress } from "./compress"
 import { mapkv } from "./map"
 
 import { type Compilation } from "./compilation"
-import { type Manifest } from "./manifest"
+import { type Dictionary } from "./compress"
 
+export function props<T> (ctx : Compilation, dictionary : Dictionary, _props : T) : Promise<string> {
+	const data = typeof _props === "object" && _props ? _props : {}
+	const compressed = mapkv(data, v => compress(dictionary, v))
 
-export function props<T> (ctx : Compilation, p : T) : Promise<string> {
-	return ctx.write(`/${jspath}/p.json`, JSON.stringify(p), true)
+	return ctx.write(`/${jspath}/p.json`, JSON.stringify(compressed), true)
 }

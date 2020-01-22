@@ -75,6 +75,8 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 		run(cfg.globals || Promise.resolve({})),
 	])
 
+	const dictionary = cfg.dictionary || defaults.dictionary
+
 	const m : Manifest = {
 		...cfg,
 		images: {
@@ -88,7 +90,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 			quality: cfg.images?.quality || 90,
 		},
 		root: pth,
-		dictionary: cfg.dictionary || defaults.dictionary,
+		dictionary,
 		globals,
 		routes:
 			await Promise.all(
@@ -97,7 +99,7 @@ export async function manifest (ctx : Compilation) : Promise<Manifest> {
 					.map(async route => ({
 						...route,
 						id: hash(path.resolve(ctx.config.root, route.import)),
-						propsfile: await props(ctx, route.props),
+						propsfile: await props(ctx, dictionary, route.props),
 					})),
 			),
 		assets: Array.from(assets),

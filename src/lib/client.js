@@ -5,6 +5,7 @@ import { matchPath } from "react-router"
 import { BrowserRouter, Link as RLink } from "react-router-dom"
 
 import { HeadProvider } from "__PACKAGE_NAME__/head"
+import { decompress } from "../compress"
 
 export { useFrame } from "./use-frame"
 export { default as Picture } from "./picture"
@@ -66,9 +67,10 @@ const cache = {}
 async function _get (propsfile : string) : Promise<mixed> {
 	const resp = await fetch(propsfile)
 	const data = await resp.json()
-	cache[propsfile] = data
+	const full = decompress(window.__frame_dictionary, data)
 
-	return data
+	cache[propsfile] = full
+	return full
 }
 
 const promises = {}

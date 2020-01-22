@@ -62,6 +62,7 @@ if (global.IS_SERVER) {
 } else {
 	window.__frame_globals = GLOBALS
 	window.__frame_routes = info
+	window.__frame_dictionary = DICTIONARY
 }
 
 function useRoute (path) {
@@ -116,6 +117,7 @@ export default init(async function () {
 		IS_SERVER: "IS_SERVER",
 		GLOBALS: JSON.stringify(manifest.globals),
 		ROUTES: JSON.stringify(rts),
+		DICTIONARY: JSON.stringify(manifest.dictionary),
 	})
 
 	const gen = generate(ast)
