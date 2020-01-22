@@ -9,7 +9,6 @@ import { cache } from "./cache"
 
 import { manifest } from "./manifest"
 import { watch as watchClient } from "./watch"
-import { entrypoints } from "./entrypoints"
 import { render } from "./render"
 import { serve } from "./serve"
 import { gzip } from "./gzip"
@@ -189,7 +188,6 @@ export class Compilation {
 			m = await manifest(ctx)
 
 			// Changing the entrypoints will trigger a client build
-			// e = await entrypoints(ctx, m)
 			e = await spa(ctx, m)
 
 			// Add new files to be watched
