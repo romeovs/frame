@@ -23,7 +23,7 @@ export type {
 	ImageFormat,
 }
 
-export async function init (build : () => Promise<React.ComponentType<null>>, Fallback : ?React.ComponentType<mixed>, timeout : number) {
+export async function init (build : () => Promise<React.ComponentType<{}>>, Fallback : ?React.ComponentType<mixed>, timeout : number) {
 	const Component = await build()
 
 	const comp = (
@@ -113,11 +113,22 @@ export async function lazy (id : string, fn : () => Promise<Module>, force : boo
 type LinkProps = {
 	href : string,
 	children : React.Node,
-	onMouseEnter? : React.HTMLMouseEvent<any> => void,
+	onMouseEnter? : SyntheticMouseEvent<HTMLAnchorElement> => void,
 	...,
 }
 
-export function match (url : string) {
+type Match = {
+	id : string,
+	pf : string,
+	match : {
+		params : mixed,
+		path : string,
+		url : string,
+		isExact : boolean,
+	},
+}
+
+export function match (url : string) : ?Match {
 	for (const path in window.__frame_routes) {
 		const match = matchPath(url, { path, exact: true, strict: false })
 		if (match) {
@@ -146,7 +157,7 @@ function preload (href : string) {
 export function Link (props : LinkProps) : React.Node {
 	const { href, children, onMouseEnter, ...rest } = props
 
-	function handleEnter (evt) {
+	function handleEnter (evt : SyntheticMouseEvent<HTMLAnchorElement>) {
 		if (onMouseEnter) {
 			onMouseEnter(evt)
 		}
