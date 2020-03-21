@@ -9,9 +9,14 @@ type MatomoConfig = {
 	host : string,
 }
 
+type GoogleConfig = {
+	id : string,
+}
+
 export type AnalyticsConfig = {
 	fathom? : FathomConfig,
 	matomo? : MatomoConfig,
+	google? : GoogleConfig,
 }
 
 // Add analytics scripts
@@ -20,6 +25,7 @@ export function analytics (config : AnalyticsConfig) : React.Node {
 		<>
 			{fathom(config.fathom)}
 			{matomo(config.matomo)}
+			{google(config.google)}
 		</>
 	)
 }
@@ -60,6 +66,27 @@ function matomo (config : ?MatomoConfig) : React.Node {
 			g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
 		})();
 	`)
+}
+
+function google (config : ?GoogleConfig) : React.Node {
+	if (!config) {
+		return null
+	}
+
+	const { id } = config
+	const src = `https://www.googletagmanager.com/gtag/js?id=${id}`
+
+	return (
+		<>
+			<script async src={src} />
+			{script(`
+				window.dataLayer = window.dataLayer || [];
+				function gtag(){dataLayer.push(arguments);}
+				gtag('js', new Date());
+				gtag('config', '${id}');
+			`)}
+		</>
+	)
 }
 
 function script (str : string) : React.Node {
