@@ -59,7 +59,7 @@
     "postcss-property-lookup": "^2.0.0",
     "postcss-simple-vars": "^5.0.2",
     "postcss-url": "^8.0.0",
-    "printf": "^0.5.2",
+    "printf": "^0.6.1",
     "purgecss": "^1.4.1",
     "rollup": "^1.26.5",
     "rollup-plugin-babel": "^4.3.3",

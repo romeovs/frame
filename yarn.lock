@@ -7071,10 +7071,10 @@ primitive-pool@^1.1.0:
   resolved "https://registry.yarnpkg.com/primitive-pool/-/primitive-pool-1.1.0.tgz#c2b2e49ff7402d5fc69c80c12f3c18b4b19a7799"
   integrity sha512-pl4l1R9OWWb4XmUpeX30yGz8ukZ25EiLhwlP2KqOqCb8NkwJt8qUeuCQEsk8CiAS7msICbPD18csu8jcIX7GNg==
 
-printf@^0.5.2:
-  version "0.5.2"
-  resolved "https://registry.yarnpkg.com/printf/-/printf-0.5.2.tgz#8546e01a1f647b1dff510ae92bdc92beb8c9b2f9"
-  integrity sha512-Hn0UuWqTRd94HiCJoiCNGZTnSyXJdIF3t4/4I293hezIzyH4pQ3ai4TlH/SmRCiMvR5aNMxSYWshjQWWW6J8MQ==
+printf@^0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/printf/-/printf-0.6.1.tgz#b9afa3d3b55b7f2e8b1715272479fc756ed88650"
+  integrity sha512-is0ctgGdPJ5951KulgfzvHGwJtZ5ck8l042vRkV6jrkpBzTmb/lueTqguWHy2JfVA+RY6gFVlaZgUS0j7S/dsw==
 
 private@^0.1.6:
   version "0.1.8"
