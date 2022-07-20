@@ -75,7 +75,7 @@
     "style-loader": "^1.0.0",
     "sugarss": "^2.0.0",
     "systemjs": "^6.1.4",
-    "terser": "^4.4.0",
+    "terser": "^4.8.1",
     "webpack": "^4.41.2",
     "webpack-hot-middleware": "^2.25.0",
     "whatwg-fetch": "^3.0.0",
